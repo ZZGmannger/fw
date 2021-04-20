@@ -573,8 +573,8 @@ void hw_serial_isr(struct serial_device *serial, int event)
         case SERIAL_EVENT_TX_DMADONE:
         {
             uint16_t data_size;
-            uint8_t last_data_ptr[128];
-			uint8_t data_ptr[128];
+            uint8_t last_data_ptr[1024];
+			uint8_t data_ptr[1024];
 
             data_queue_pop(&serial->tx_data_queue , last_data_ptr, &data_size);
             if (data_queue_peak(&serial->tx_data_queue, data_ptr, &data_size) == 0)

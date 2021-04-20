@@ -9,7 +9,7 @@
 #define KEY_PIN    (0)
 
 
-#define TUART     "uart1"
+#define TUART     "uart2"
 
 struct serial_device*  uart1;
 
@@ -21,11 +21,11 @@ void key_press_hander(void *args)
     
     if(flag)
     {
-      pin_write(LED_PIN, PIN_LOW);
+		pin_write(LED_PIN, PIN_LOW);
     }
     else
     {
-       pin_write(LED_PIN ,PIN_HIGH);
+		pin_write(LED_PIN ,PIN_HIGH);
     }
 }
  
@@ -37,7 +37,6 @@ int uart1_rx_ind(struct serial_device* serial , uint16_t size)
 	len = size;
   	serial_read(serial , buf, len);
     serial_write(serial , buf, size);
-	serial_write(serial , buf, size);
 	return 0;
 }
 
@@ -59,7 +58,7 @@ int main(void)
 	  	struct serial_configure cfg = SERIAL_CONFIG_DEFAULT;
 	    cfg.baud_rate =9600;
 		serial_control(uart1  , DEVICE_CTRL_CONFIG , &cfg);
-		serial_open(uart1 ,   SERIAL_FLAG_INT_IDLE_RX|SERIAL_FLAG_DMA_TX);
+		serial_open(uart1 ,   SERIAL_FLAG_DMA_RX|SERIAL_FLAG_INT_TX);
 	    serial_set_rx_indicate(uart1 , uart1_rx_ind);
 	}
 	
