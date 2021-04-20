@@ -42,6 +42,8 @@ uint16_t ringbuffer_put_force(struct ringbuffer *rb, const uint8_t *ptr , uint16
 uint16_t ringbuffer_putchar(struct ringbuffer *rb, const uint8_t ch);
 uint16_t ringbuffer_putchar_force(struct ringbuffer *rb, const uint8_t ch);
 uint16_t ringbuffer_get(struct ringbuffer *rb , uint8_t *ptr , uint16_t length);
+uint16_t ringbuffer_peak(struct ringbuffer *rb, uint8_t *ptr , uint16_t length);
+                           
 uint16_t ringbuffer_getchar(struct ringbuffer *rb , uint8_t *ch);
 uint16_t ringbuffer_data_len(struct ringbuffer *rb);
 

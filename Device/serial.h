@@ -41,11 +41,13 @@
 #define NRZ_INVERTED                    1       /* Non Return to Zero : inverted mode */
 
 
-#define SERIAL_EVENT_RX_IND          0x01    /* Rx indication */
-#define SERIAL_EVENT_TX_DONE         0x02    /* Tx complete   */
-#define SERIAL_EVENT_RX_DMADONE      0x03    /* Rx DMA transfer done */
-#define SERIAL_EVENT_TX_DMADONE      0x04    /* Tx DMA transfer done */
-#define SERIAL_EVENT_RX_TIMEOUT      0x05    /* Rx timeout    */
+#define SERIAL_EVENT_RX_BYTE_IND	 0x01    /* Rx indication */
+#define SERIAL_EVENT_RX_IDLE_IND	 0x02    /* Rx indication */
+#define SERIAL_EVENT_TX_DONE         0x03    /* Tx complete   */
+#define SERIAL_EVENT_RX_DMAHALF      0x04    /* Rx DMA transfer done */
+#define SERIAL_EVENT_RX_DMADONE      0x05    /* Rx DMA transfer done */
+#define SERIAL_EVENT_TX_DMADONE      0x06    /* Tx DMA transfer done */
+#define SERIAL_EVENT_RX_TIMEOUT      0x07    /* Rx timeout    */
 
 #define SERIAL_DMA_RX                0x01
 #define SERIAL_DMA_TX                0x02
@@ -62,40 +64,32 @@
 
 
 
-#define SERIAL_FLAG_INT_RX        0x100           /**< INT mode on Rx */
-#define SERIAL_FLAG_DMA_RX        0x200           /**< DMA mode on Rx */
+#define SERIAL_FLAG_INT_BYTE_RX     0x100           /**< Byte INT mode on Rx */
+#define SERIAL_FLAG_INT_IDLE_RX     0x1000			/**< IDLE INT mode on Rx */
+#define SERIAL_FLAG_DMA_RX        	0x200           /**< DMA mode on Rx */
 
-#define SERIAL_FLAG_INT_TX        0x400           /**< INT mode on Tx */
-#define SERIAL_FLAG_DMA_TX        0x800           /**< DMA mode on Tx */
+#define SERIAL_FLAG_INT_TX        	0x400           /**< INT mode on Tx */
+#define SERIAL_FLAG_DMA_TX        	0x800           /**< DMA mode on Tx */
 
-
-
-#define DEVICE_FLAG_REMOVABLE        0x004           /**< removable device */
-#define DEVICE_FLAG_STANDALONE       0x008           /**< standalone device */
-#define DEVICE_FLAG_ACTIVATED        0x010           /**< device is activated */
-#define DEVICE_FLAG_SUSPENDED        0x020           /**< device is suspended */
-#define DEVICE_FLAG_STREAM           0x040           /**< stream mode */
-
-
-#define DEVICE_CTRL_RESUME           0x01            /**< resume device */
-#define DEVICE_CTRL_SUSPEND          0x02            /**< suspend device */
 #define DEVICE_CTRL_CONFIG           0x03            /**< configure device */
-
-
 #define DEVICE_CTRL_SET_INT          0x10            /**< set interrupt */
 #define DEVICE_CTRL_CLR_INT          0x11            /**< clear interrupt */
 #define DEVICE_CTRL_GET_INT          0x12            /**< get interrupt status */
 
 /* Default config for serial_configure structure */
-#define RT_SERIAL_CONFIG_DEFAULT           \
+#define SERIAL_RB_BUFSZ     1024
+#define SERIAL_TB_BUFSZ     1024
+
+#define SERIAL_CONFIG_DEFAULT           \
 {                                          \
     BAUD_RATE_115200,   /* 115200 bits/s */  \
+	SERIAL_RB_BUFSZ, 	/* Buffer size */  \
+	SERIAL_TB_BUFSZ, 	/* Buffer size */  \
     DATA_BITS_8,        /* 8 databits */     \
     STOP_BITS_1,        /* 1 stopbit */      \
     PARITY_NONE,        /* No parity  */     \
     BIT_ORDER_LSB,      /* LSB first sent */ \
     NRZ_NORMAL,         /* Normal mode */    \
-    RT_SERIAL_RB_BUFSZ, /* Buffer size */  \
     0                                      \
 }
 
@@ -127,15 +121,18 @@ struct serial_device
     
     uint16_t init_flag;
     uint16_t open_flag;
-	uint16_t ref_count;
+	
+    uint16_t ref_count;
+    uint8_t tx_dma_activated;
+    uint8_t rx_dma_activated;
 	
 	struct ringbuffer rx_fifo_rb;
 	struct ringbuffer tx_fifo_rb;
 	
 	struct data_queue tx_data_queue;
 	
-	void* rx_buffer;
-    void* tx_buffer;
+	uint8_t rx_buffer[SERIAL_RB_BUFSZ];
+    uint8_t tx_buffer[SERIAL_TB_BUFSZ];
 };
 
 /**
@@ -159,7 +156,6 @@ void hw_serial_isr(struct serial_device *serial, int event);
 
 int hw_serial_register(struct serial_device            *serial,
                                const char              *name,
-							   const struct uart_ops   *ops,
                                uint32_t                flag,
                                void                   *data);
 
@@ -169,8 +165,6 @@ int hw_serial_register(struct serial_device            *serial,
 uplayer API
 */			
 struct serial_device* serial_find(const char* name);
-
-int serial_init(struct serial_device* serial);
 
 int serial_open(struct serial_device* serial, uint16_t oflag);
 
@@ -187,7 +181,6 @@ int serial_set_tx_complete(struct serial_device* serial,
  
 int serial_set_rx_indicate(struct serial_device* serial, 
 						   int (*rx_ind)(struct serial_device* serial,uint16_t size));
-
 
 
 #endif

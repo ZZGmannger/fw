@@ -257,6 +257,42 @@ uint16_t ringbuffer_get(struct ringbuffer *rb,
     return length;
 }
 
+uint16_t ringbuffer_peak(struct ringbuffer *rb,
+                            uint8_t           *ptr,
+                            uint16_t           length)
+{
+	uint16_t size;
+
+    RB_ASSERT(rb != RT_NULL);
+
+    /* whether has enough data  */
+    size = ringbuffer_data_len(rb);
+
+    /* no data */
+    if (size == 0)
+        return 0;
+
+    /* less data */
+    if (size < length)
+        length = size;
+
+    if (rb->buffer_size - rb->read_index > length)
+    {
+        /* copy all of data */
+        memcpy(ptr, &rb->buffer_ptr[rb->read_index], length);
+        return length;
+    }
+
+    memcpy(&ptr[0],
+           &rb->buffer_ptr[rb->read_index],
+           rb->buffer_size - rb->read_index);
+    memcpy(&ptr[rb->buffer_size - rb->read_index],
+           &rb->buffer_ptr[0],
+           length - (rb->buffer_size - rb->read_index));
+
+    return length;
+}
+
 /**
  * put a character into ring buffer
  */
