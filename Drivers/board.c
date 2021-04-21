@@ -21,12 +21,12 @@ void hw_interrupt_disable(void)
 	irq_level++;
 }
 
-void interrupt_enter(void)
+void hw_interrupt_enter(void)
 {
 	__disable_irq(); 
 }
 
-void interrupt_leave(void)
+void hw_interrupt_leave(void)
 {
 	__enable_irq(); 
 }
@@ -50,7 +50,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+   
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
@@ -63,7 +63,7 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
-    Error_Handler();
+   
   }
 }
 
@@ -165,7 +165,7 @@ void Error_Handler(void)
   }
 }
 
-void board_init(void)
+void hw_board_init(void)
 {
 	SystemClock_Config();
 

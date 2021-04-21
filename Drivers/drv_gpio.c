@@ -194,7 +194,7 @@ static struct pin_irq_hdr pin_irq_hdr_tab[] =
     {-1, 0, NULL, NULL},
     {-1, 0, NULL, NULL},
 };
-static uint32_t pin_irq_enable_mask=0;
+static s_uint32_t pin_irq_enable_mask=0;
 
 
 #define ITEM_NUM(items) sizeof(items) / sizeof(items[0])
@@ -216,7 +216,7 @@ static const struct pin_index *get_pin(uint8_t pin)
     return index;
 };
 
-static void stm32_pin_write(uint8_t pin, uint8_t value)
+static void stm32_pin_write(s_uint8_t pin, s_uint8_t value)
 {
     const struct pin_index *index;
 
@@ -229,7 +229,7 @@ static void stm32_pin_write(uint8_t pin, uint8_t value)
     HAL_GPIO_WritePin(index->gpio, index->pin, (GPIO_PinState)value);
 }
 
-static int stm32_pin_read(uint8_t pin)
+static s_err_t stm32_pin_read(s_uint8_t pin)
 {
     int value;
     const struct pin_index *index;
@@ -248,7 +248,7 @@ static int stm32_pin_read(uint8_t pin)
 }
 
 
-static void stm32_pin_mode(uint8_t pin, uint8_t mode)
+static void stm32_pin_mode(s_uint8_t pin, s_uint8_t mode)
 {
     const struct pin_index *index;
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -300,7 +300,7 @@ static void stm32_pin_mode(uint8_t pin, uint8_t mode)
 }
 
 /*irq--------------------------------------------------------------------------*/
-static inline int bit2bitno(uint32_t bit)
+GSI_INLINE int bit2bitno(s_uint32_t bit)
 {
     int i;
     for (i = 0; i < 32; i++)
@@ -312,7 +312,7 @@ static inline int bit2bitno(uint32_t bit)
     }
     return -1;
 }
-static inline const struct pin_irq_map *get_pin_irq_map(uint32_t pinbit)
+GSI_INLINE const struct pin_irq_map *get_pin_irq_map(s_uint32_t pinbit)
 {
     int32_t mapindex = bit2bitno(pinbit);
     if (mapindex < 0 || mapindex >= ITEM_NUM(pin_irq_map))
@@ -323,7 +323,7 @@ static inline const struct pin_irq_map *get_pin_irq_map(uint32_t pinbit)
 };
 
 
-static int stm32_pin_attach_irq(uint8_t pin,uint8_t mode,
+static s_err_t stm32_pin_attach_irq(s_uint8_t pin , s_uint8_t mode,
                                 void (*hdr)(void *args), void *args)
 {
     const struct pin_index *index;
@@ -364,7 +364,7 @@ static int stm32_pin_attach_irq(uint8_t pin,uint8_t mode,
     return 0;
 }
 
-static int stm32_pin_dettach_irq(uint8_t pin)
+static s_err_t stm32_pin_dettach_irq(uint8_t pin)
 {
     const struct pin_index *index;
 
@@ -397,7 +397,7 @@ static int stm32_pin_dettach_irq(uint8_t pin)
 }
 
 
-static int stm32_pin_irq_enable(uint8_t pin,uint8_t enabled)
+static s_err_t stm32_pin_irq_enable(uint8_t pin,uint8_t enabled)
                                      
 {
     const struct pin_index *index;
@@ -508,7 +508,7 @@ const static struct pin_ops _stm32_pin_ops =
     stm32_pin_irq_enable,
 };
 
-static inline void pin_irq_hdr(int irqno)
+GSI_INLINE void pin_irq_hdr(int irqno)
 {
     if (pin_irq_hdr_tab[irqno].hdr)
     {
@@ -524,60 +524,60 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void EXTI0_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void EXTI1_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void EXTI2_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void EXTI3_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void EXTI4_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void EXTI9_5_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void EXTI15_10_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 

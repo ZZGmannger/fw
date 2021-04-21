@@ -1,9 +1,6 @@
 
-
 #include "ringbuffer.h"
 
-#define RB_ASSERT(...)
-#define ALIGN_DOWN(size, align)      ((size) & ~((align) - 1))
 
 static inline enum ringbuffer_state ringbuffer_status(struct ringbuffer *rb)
 {
@@ -18,11 +15,11 @@ static inline enum ringbuffer_state ringbuffer_status(struct ringbuffer *rb)
 }
 
 void ringbuffer_init(struct ringbuffer *rb,
-                     uint8_t           *pool,
-                     int16_t            size)
+                     s_uint8_t           *pool,
+                     s_int16_t            size)
 {
-    RB_ASSERT(rb != NULL);
-    RB_ASSERT(size > 0);
+    GSI_ASSERT(rb != NULL);
+    GSI_ASSERT(size > 0);
 
     /* initialize read and write index */
     rb->read_mirror = rb->read_index = 0;
@@ -30,14 +27,14 @@ void ringbuffer_init(struct ringbuffer *rb,
 
     /* set buffer pool and size */
     rb->buffer_ptr = pool;
-    rb->buffer_size = ALIGN_DOWN(size, 4);
+    rb->buffer_size = GSI_ALIGN_DOWN(size, 4);
 }
  
-uint16_t ringbuffer_updata_put_index(struct ringbuffer *rb , uint16_t length)
+s_uint16_t ringbuffer_updata_put_index(struct ringbuffer *rb , s_uint16_t length)
 {
-	uint16_t size;
+	s_uint16_t size;
 
-    RB_ASSERT(rb != NULL);
+    GSI_ASSERT(rb != NULL);
 
     /* whether has enough space */
     size = ringbuffer_space_len(rb);
@@ -70,13 +67,13 @@ uint16_t ringbuffer_updata_put_index(struct ringbuffer *rb , uint16_t length)
 /**
  * put a block of data into ring buffer
  */
-uint16_t ringbuffer_put(struct ringbuffer *rb,
-                            const uint8_t     *ptr,
-                            uint16_t           length)
+s_uint16_t ringbuffer_put(struct ringbuffer *rb,
+                            const s_uint8_t     *ptr,
+                            s_uint16_t           length)
 {
-    uint16_t size;
+    s_uint16_t size;
 
-    RB_ASSERT(rb != NULL);
+    GSI_ASSERT(rb != NULL);
 
     /* whether has enough space */
     size = ringbuffer_space_len(rb);
@@ -92,17 +89,17 @@ uint16_t ringbuffer_put(struct ringbuffer *rb,
     if (rb->buffer_size - rb->write_index > length)
     {
         /* read_index - write_index = empty space */
-        memcpy(&rb->buffer_ptr[rb->write_index], ptr, length);
+        s_memcpy(&rb->buffer_ptr[rb->write_index], ptr, length);
         /* this should not cause overflow because there is enough space for
          * length of data in current mirror */
         rb->write_index += length;
         return length;
     }
 
-    memcpy(&rb->buffer_ptr[rb->write_index],
+    s_memcpy(&rb->buffer_ptr[rb->write_index],
            &ptr[0],
            rb->buffer_size - rb->write_index);
-    memcpy(&rb->buffer_ptr[0],
+    s_memcpy(&rb->buffer_ptr[0],
            &ptr[rb->buffer_size - rb->write_index],
            length - (rb->buffer_size - rb->write_index));
 
@@ -114,11 +111,11 @@ uint16_t ringbuffer_put(struct ringbuffer *rb,
 }
  
 
-uint16_t ringbuffer_updata_put_index_force(struct ringbuffer *rb,uint16_t length)
+s_uint16_t ringbuffer_updata_put_index_force(struct ringbuffer *rb,s_uint16_t length)
 {
-    uint16_t space_length;
+    s_uint16_t space_length;
 
-    RB_ASSERT(rb != NULL);
+    GSI_ASSERT(rb != NULL);
 
     space_length = ringbuffer_space_len(rb);
 
@@ -161,13 +158,13 @@ uint16_t ringbuffer_updata_put_index_force(struct ringbuffer *rb,uint16_t length
  *
  * When the buffer is full, it will discard the old data.
  */
-uint16_t ringbuffer_put_force(struct ringbuffer *rb,
-                            const uint8_t     *ptr,
-                            uint16_t           length)
+s_uint16_t ringbuffer_put_force(struct ringbuffer *rb,
+                            const s_uint8_t     *ptr,
+                            s_uint16_t           length)
 {
-    uint16_t space_length;
+    s_uint16_t space_length;
 
-    RB_ASSERT(rb != NULL);
+    GSI_ASSERT(rb != NULL);
 
     space_length = ringbuffer_space_len(rb);
 
@@ -214,13 +211,13 @@ uint16_t ringbuffer_put_force(struct ringbuffer *rb,
 /**
  *  get data from ring buffer
  */
-uint16_t ringbuffer_get(struct ringbuffer *rb,
-                            uint8_t           *ptr,
-                            uint16_t           length)
+s_uint16_t ringbuffer_get(struct ringbuffer *rb,
+                            s_uint8_t           *ptr,
+                            s_uint16_t           length)
 {
-    uint16_t size;
+    s_uint16_t size;
 
-    RB_ASSERT(rb != RT_NULL);
+    GSI_ASSERT(rb != RT_NULL);
 
     /* whether has enough data  */
     size = ringbuffer_data_len(rb);
@@ -257,13 +254,13 @@ uint16_t ringbuffer_get(struct ringbuffer *rb,
     return length;
 }
 
-uint16_t ringbuffer_peak(struct ringbuffer *rb,
-                            uint8_t           *ptr,
-                            uint16_t           length)
+s_uint16_t ringbuffer_peak(struct ringbuffer *rb,
+                            s_uint8_t           *ptr,
+                            s_uint16_t           length)
 {
-	uint16_t size;
+	s_uint16_t size;
 
-    RB_ASSERT(rb != RT_NULL);
+    GSI_ASSERT(rb != RT_NULL);
 
     /* whether has enough data  */
     size = ringbuffer_data_len(rb);
@@ -296,9 +293,9 @@ uint16_t ringbuffer_peak(struct ringbuffer *rb,
 /**
  * put a character into ring buffer
  */
-uint16_t ringbuffer_putchar(struct ringbuffer *rb, const uint8_t ch)
+s_uint16_t ringbuffer_putchar(struct ringbuffer *rb, const s_uint8_t ch)
 {
-    RB_ASSERT(rb != RT_NULL);
+    GSI_ASSERT(rb != RT_NULL);
 
     /* whether has enough space */
     if (!ringbuffer_space_len(rb))
@@ -325,11 +322,11 @@ uint16_t ringbuffer_putchar(struct ringbuffer *rb, const uint8_t ch)
  *
  * When the buffer is full, it will discard one old data.
  */
-uint16_t ringbuffer_putchar_force(struct ringbuffer *rb, const uint8_t ch)
+s_uint16_t ringbuffer_putchar_force(struct ringbuffer *rb, const s_uint8_t ch)
 {
     enum ringbuffer_state old_state;
 
-    RB_ASSERT(rb != RT_NULL);
+    GSI_ASSERT(rb != RT_NULL);
 
     old_state = ringbuffer_status(rb);
 
@@ -359,9 +356,9 @@ uint16_t ringbuffer_putchar_force(struct ringbuffer *rb, const uint8_t ch)
 /**
  * get a character from a ringbuffer
  */
-uint16_t ringbuffer_getchar(struct ringbuffer *rb, uint8_t *ch)
+s_uint16_t ringbuffer_getchar(struct ringbuffer *rb, s_uint8_t *ch)
 {
-    RB_ASSERT(rb != RT_NULL);
+    GSI_ASSERT(rb != RT_NULL);
 
     /* ringbuffer is empty */
     if (!ringbuffer_data_len(rb))
@@ -386,7 +383,7 @@ uint16_t ringbuffer_getchar(struct ringbuffer *rb, uint8_t *ch)
 /** 
  * get the size of data in rb 
  */
-uint16_t ringbuffer_data_len(struct ringbuffer *rb)
+s_uint16_t ringbuffer_data_len(struct ringbuffer *rb)
 {
     switch (ringbuffer_status(rb))
     {
@@ -408,7 +405,7 @@ uint16_t ringbuffer_data_len(struct ringbuffer *rb)
  */
 void ringbuffer_reset(struct ringbuffer *rb)
 {
-    RB_ASSERT(rb != RT_NULL);
+    GSI_ASSERT(rb != RT_NULL);
 
     rb->read_mirror = 0;
     rb->read_index = 0;

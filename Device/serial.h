@@ -1,8 +1,7 @@
 #ifndef __SERIAL_H__
 #define __SERIAL_H__
 
-#include "main.h"
-#include "board.h"
+#include "gsi_def.h"
 #include "dataqueue.h"
 #include "ringbuffer.h"
 
@@ -95,17 +94,17 @@
 
 struct serial_configure
 {
-    uint32_t baud_rate;
+    s_uint32_t baud_rate;
 	
-	uint16_t rxbufsz;
-	uint16_t txbufsz;
+	s_uint16_t rxbufsz;
+	s_uint16_t txbufsz;
 	
-    uint32_t data_bits               :4;
-    uint32_t stop_bits               :2;
-    uint32_t parity                  :2;
-    uint32_t bit_order               :1;
-    uint32_t invert                  :1;
-    uint32_t reserved                :23;
+    s_uint32_t data_bits               :4;
+    s_uint32_t stop_bits               :2;
+    s_uint32_t parity                  :2;
+    s_uint32_t bit_order               :1;
+    s_uint32_t invert                  :1;
+    s_uint32_t reserved                :23;
 };
 
 struct serial_device
@@ -116,23 +115,23 @@ struct serial_device
     const struct uart_ops *ops;
     struct serial_configure   config;
     
-    int (*rx_indicate)(struct serial_device* serial, uint16_t size);
+    int (*rx_indicate)(struct serial_device* serial, s_uint16_t size);
     int (*tx_complete)(struct serial_device* serial, void *buffer);
     
-    uint16_t init_flag;
-    uint16_t open_flag;
+    s_uint16_t init_flag;
+    s_uint16_t open_flag;
 	
-    uint16_t ref_count;
-    uint8_t tx_dma_activated;
-    uint8_t rx_dma_activated;
+    s_uint16_t ref_count;
+    s_uint8_t tx_dma_activated;
+    s_uint8_t rx_dma_activated;
 	
 	struct ringbuffer rx_fifo_rb;
 	struct ringbuffer tx_fifo_rb;
 	
 	struct data_queue tx_data_queue;
 	
-	uint8_t rx_buffer[SERIAL_RB_BUFSZ];
-    uint8_t tx_buffer[SERIAL_TB_BUFSZ];
+	s_uint8_t rx_buffer[SERIAL_RB_BUFSZ];
+    s_uint8_t tx_buffer[SERIAL_TB_BUFSZ];
 };
 
 /**
@@ -146,7 +145,7 @@ struct uart_ops
     int (*putc)(struct serial_device *serial, char c);
     int (*getc)(struct serial_device *serial);
 
-    uint32_t (*dma_transmit)(struct serial_device *serial, uint8_t *buf, uint32_t size, int direction);
+    s_uint32_t (*dma_transmit)(struct serial_device *serial, s_uint8_t *buf, s_uint32_t size, int direction);
 };
 
 /*
@@ -156,7 +155,7 @@ void hw_serial_isr(struct serial_device *serial, int event);
 
 int hw_serial_register(struct serial_device            *serial,
                                const char              *name,
-                               uint32_t                flag,
+                               s_uint16_t                flag,
                                void                   *data);
 
 
@@ -166,21 +165,21 @@ uplayer API
 */			
 struct serial_device* serial_find(const char* name);
 
-int serial_open(struct serial_device* serial, uint16_t oflag);
+int serial_open(struct serial_device* serial, s_uint16_t oflag);
 
 int serial_control(struct serial_device* serial , int cmd , void *args);
                      
 int serial_close(struct serial_device* serial);
 
-uint32_t serial_read(struct serial_device* serial , void *buffer , uint32_t size);
+s_uint16_t serial_read(struct serial_device* serial , void *buffer , s_uint16_t size);
                        
-uint32_t serial_write( struct serial_device* serial , const void *buffer,uint32_t size);
+s_uint16_t serial_write( struct serial_device* serial , const void *buffer,s_uint16_t size);
                           
 int serial_set_tx_complete(struct serial_device* serial, 
 						   int (*tx_done)(struct serial_device* serial,void *buffer));
  
 int serial_set_rx_indicate(struct serial_device* serial, 
-						   int (*rx_ind)(struct serial_device* serial,uint16_t size));
+						   int (*rx_ind)(struct serial_device* serial,s_uint16_t size));
 
 
 #endif

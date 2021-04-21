@@ -8,10 +8,9 @@
 #define LED_PIN    (50)
 #define KEY_PIN    (0)
 
+#define LOG_TAG    "UTtest"
+#include <elog.h>
 
-#define TUART     "uart2"
-
-struct serial_device*  uart1;
 
 void key_press_hander(void *args)
 {
@@ -29,42 +28,54 @@ void key_press_hander(void *args)
     }
 }
  
-
-uint8_t len;
-int uart1_rx_ind(struct serial_device* serial , uint16_t size)
-{
-  	uint8_t buf[128];
-	len = size;
-  	serial_read(serial , buf, len);
-    serial_write(serial , buf, size);
-	return 0;
-}
+ void test_elog(void) ;
 
 int main(void)
 {
     HAL_Init();
 
-    board_init();
+    hw_board_init();
 
     pin_mode(LED_PIN, PIN_MODE_OUTPUT);
 
     pin_mode(KEY_PIN , PIN_MODE_INPUT_PULLUP);
     pin_attach_irq(KEY_PIN , PIN_IRQ_MODE_FALLING , key_press_hander , NULL);
     pin_irq_enable(KEY_PIN ,PIN_IRQ_ENABLE);  
+
+	/* initialize EasyLogger */
+    elog_init();
 	
-	uart1 = serial_find(TUART);
-	if(uart1 != NULL)
-	{
-	  	struct serial_configure cfg = SERIAL_CONFIG_DEFAULT;
-	    cfg.baud_rate =9600;
-		serial_control(uart1  , DEVICE_CTRL_CONFIG , &cfg);
-		serial_open(uart1 ,   SERIAL_FLAG_DMA_RX|SERIAL_FLAG_INT_TX);
-	    serial_set_rx_indicate(uart1 , uart1_rx_ind);
-	}
+	elog_set_text_color_enabled(true);
+
+    /* set EasyLogger log format */
+    elog_set_fmt(ELOG_LVL_ERROR,  ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
+    elog_set_fmt(ELOG_LVL_WARN,   ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
+    elog_set_fmt(ELOG_LVL_INFO,   ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
+    elog_set_fmt(ELOG_LVL_DEBUG,  ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
+    elog_set_fmt(ELOG_LVL_VERBOSE,ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
+    /* start EasyLogger */
+    elog_start();
 	
     while (1)
     {
-        HAL_Delay(1000);
+	   	test_elog();
+        HAL_Delay(3000);
     }
 }
+/**
+ * EasyLogger demo
+ */
+char nn[]={"Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!\r\n"};
+void elog_port_output(const char *log, size_t size);
+void test_elog(void) {
+    /* test log output for all level */
+	elog_port_output(nn ,sizeof(nn) ) ;
+	elog_port_output(nn ,sizeof(nn) ) ;
+	elog_port_output(nn ,sizeof(nn) ) ;
+//  LOG_E("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
+// 	LOG_W("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
+// 	LOG_I("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
+// 	LOG_D("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
+// 	LOG_V("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
 
+}

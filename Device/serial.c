@@ -3,20 +3,19 @@
  
 static struct serial_device _hw_serial;
 
-#define SER_ASSERT(...)
 #define SER_LOG(...)
 
 /*
  * Serial poll routines
  */
-static inline int _serial_poll_rx(struct serial_device *serial , 
-                                   uint8_t *data , 
+GSI_INLINE int _serial_poll_rx(struct serial_device *serial , 
+                                   s_uint8_t *data , 
                                    int length)
 {
     int ch;
     int size;
 
-    SER_ASSERT(serial != RT_NULL);
+    GSI_ASSERT(serial != GSI_NULL);
     size = length;
 
     while (length)
@@ -34,12 +33,12 @@ static inline int _serial_poll_rx(struct serial_device *serial ,
     return (size - length);
 }
 
-static inline int _serial_poll_tx(struct serial_device *serial , 
-                                  const uint8_t *data , 
+GSI_INLINE int _serial_poll_tx(struct serial_device *serial , 
+                                  const s_uint8_t *data , 
                                   int length)
 {
     int size;
-    SER_ASSERT(serial != RT_NULL);
+    GSI_ASSERT(serial != GSI_NULL);
 
     size = length;
     while (length)
@@ -56,28 +55,28 @@ static inline int _serial_poll_tx(struct serial_device *serial ,
 /*
  * Serial interrupt routines
  */
-static inline int _serial_int_rx(struct serial_device *serial, 
-                                 uint8_t *data, 
+GSI_INLINE int _serial_int_rx(struct serial_device *serial, 
+                                 s_uint8_t *data, 
                                  int length)
 {
     int size;
  
-    SER_ASSERT(serial != NULL);
+    GSI_ASSERT(serial != NULL);
     size = length;
 
     /* read from software FIFO */
     while (length)
     {
-        uint8_t ch;
+        s_uint8_t ch;
     
         /* disable interrupt */
-        hw_interrupt_disable();
+        interrupt_disable();
 
         /* there's no data: */
 		if(0 == ringbuffer_data_len(&serial->rx_fifo_rb))
         {
             /* no data, enable interrupt and break out */
-            hw_interrupt_enable();
+            interrupt_enable();
             break;
         }
 
@@ -85,7 +84,7 @@ static inline int _serial_int_rx(struct serial_device *serial,
 		ringbuffer_getchar(&serial->rx_fifo_rb , &ch);
 		
         /* enable interrupt */
-        hw_interrupt_enable();
+        interrupt_enable();
 
         *data = ch;
         ++data; 
@@ -95,13 +94,13 @@ static inline int _serial_int_rx(struct serial_device *serial,
     return (size - length);
 }
 
-static inline int _serial_int_tx(struct serial_device *serial, 
-                                 const uint8_t *data, 
+GSI_INLINE int _serial_int_tx(struct serial_device *serial, 
+                                 const s_uint8_t *data, 
                                  int length)
 {
     int size;
  
-    SER_ASSERT(serial != NULL);
+    GSI_ASSERT(serial != NULL);
 
     size = length;
     
@@ -122,9 +121,9 @@ static inline int _serial_int_tx(struct serial_device *serial,
 /*
  * Serial dma routines
  */	
-static inline int _serial_dma_rx(struct serial_device *serial, uint8_t *data, int length)
+GSI_INLINE int _serial_dma_rx(struct serial_device *serial, s_uint8_t *data, int length)
 {
-    SER_ASSERT((serial != NULL) && (data != NULL));
+    GSI_ASSERT((serial != NULL) && (data != NULL));
 
     hw_interrupt_disable();
 
@@ -135,7 +134,7 @@ static inline int _serial_dma_rx(struct serial_device *serial, uint8_t *data, in
         if (serial->rx_dma_activated != 1)
         {
             serial->rx_dma_activated = 1;
-            SER_ASSERT(serial->ops->dma_transmit != NULL);
+            GSI_ASSERT(serial->ops->dma_transmit != NULL);
             serial->ops->dma_transmit(serial, data, length, SERIAL_DMA_RX);
         }
         else 
@@ -152,8 +151,8 @@ static inline int _serial_dma_rx(struct serial_device *serial, uint8_t *data, in
     }
     else
     {
-        uint16_t recv_len = 0;
-		uint16_t fifo_recved_len = ringbuffer_data_len(&serial->rx_fifo_rb);;
+        s_uint16_t recv_len = 0;
+		s_uint16_t fifo_recved_len = ringbuffer_data_len(&serial->rx_fifo_rb);;
  
         if (length < (int)fifo_recved_len)
         {
@@ -171,7 +170,7 @@ static inline int _serial_dma_rx(struct serial_device *serial, uint8_t *data, in
     }
 }
 
-static inline int _serial_dma_tx(struct serial_device *serial, const uint8_t *data, int length)
+GSI_INLINE int _serial_dma_tx(struct serial_device *serial, const s_uint8_t *data, int length)
 {
     int result;
 
@@ -185,7 +184,7 @@ static inline int _serial_dma_tx(struct serial_device *serial, const uint8_t *da
             hw_interrupt_enable();
 
             /* make a DMA transfer */
-            serial->ops->dma_transmit(serial, (uint8_t *)data, length , SERIAL_DMA_TX);
+            serial->ops->dma_transmit(serial, (s_uint8_t *)data, length , SERIAL_DMA_TX);
         }
         else
         {
@@ -224,7 +223,7 @@ static int serial_init(struct serial_device* serial)
 {
     int result =0;
     
-    SER_ASSERT(serial);
+    GSI_ASSERT(serial);
     
     /* initialize rx/tx */
 	serial->config.rxbufsz = SERIAL_RB_BUFSZ;
@@ -238,10 +237,10 @@ static int serial_init(struct serial_device* serial)
     return result;
 }
 
-int serial_open(struct serial_device* serial, uint16_t oflag)
+int serial_open(struct serial_device* serial, s_uint16_t oflag)
 {
     int result = 0;
-    SER_ASSERT(serial);
+    GSI_ASSERT(serial);
     
     result = serial_init(serial);
     if(0 != result)
@@ -340,7 +339,7 @@ int serial_open(struct serial_device* serial, uint16_t oflag)
 
 int serial_close(struct serial_device* serial)
 {
-    SER_ASSERT(serial);
+    GSI_ASSERT(serial);
     
     if(serial->ref_count >1)
     {
@@ -380,7 +379,7 @@ int serial_close(struct serial_device* serial)
     return 0;
 }
 
-uint32_t serial_read(struct serial_device* serial,void *buffer, uint32_t size)
+s_uint16_t serial_read(struct serial_device* serial,void *buffer, s_uint16_t size)
 {
     if (size == 0) 
     {
@@ -389,18 +388,18 @@ uint32_t serial_read(struct serial_device* serial,void *buffer, uint32_t size)
     if (serial->open_flag & SERIAL_FLAG_INT_BYTE_RX || 
 		serial->open_flag & SERIAL_FLAG_INT_IDLE_RX)
     {
-        return _serial_int_rx(serial, (uint8_t *)buffer, size);
+        return _serial_int_rx(serial, (s_uint8_t *)buffer, size);
     }
 
     else if (serial->open_flag & SERIAL_FLAG_DMA_RX)
     {
-        return _serial_dma_rx(serial, (uint8_t *)buffer, size);
+        return _serial_dma_rx(serial, (s_uint8_t *)buffer, size);
     }
 
-    return _serial_poll_rx(serial, (uint8_t *)buffer, size); 
+    return _serial_poll_rx(serial, (s_uint8_t *)buffer, size); 
 }
 
-uint32_t serial_write(struct serial_device* serial,const void *buffer,uint32_t size)                       
+s_uint16_t serial_write(struct serial_device* serial,const void *buffer,s_uint16_t size)                       
 {
     if (size == 0) 
     {
@@ -408,21 +407,21 @@ uint32_t serial_write(struct serial_device* serial,const void *buffer,uint32_t s
     }
     if (serial->open_flag & SERIAL_FLAG_INT_TX)
     {
-        return _serial_int_tx(serial, (const uint8_t *)buffer, size);
+        return _serial_int_tx(serial, (const s_uint8_t *)buffer, size);
     }
     else if (serial->open_flag & SERIAL_FLAG_DMA_TX)
     {
-        return _serial_dma_tx(serial, (const uint8_t *)buffer, size);
+        return _serial_dma_tx(serial, (const s_uint8_t *)buffer, size);
     }
     else
     {
-        return _serial_poll_tx(serial, (const uint8_t *)buffer, size);
+        return _serial_poll_tx(serial, (const s_uint8_t *)buffer, size);
     }
 }
 int serial_set_tx_complete(struct serial_device* serial, 
 						   int (*tx_done)(struct serial_device* serial,void *buffer))
 {
-	SER_ASSERT(serial);
+	GSI_ASSERT(serial);
 	
 	serial->tx_complete = tx_done;
 	return 0;
@@ -430,9 +429,9 @@ int serial_set_tx_complete(struct serial_device* serial,
 
 
 int serial_set_rx_indicate(struct serial_device* serial, 
-						   int (*rx_ind)(struct serial_device* serial,uint16_t size))
+						   int (*rx_ind)(struct serial_device* serial,s_uint16_t size))
 {
-	SER_ASSERT(serial);
+	GSI_ASSERT(serial);
 	serial->rx_indicate = rx_ind;
 	return 0;
 }
@@ -442,7 +441,7 @@ int serial_control(struct serial_device* serial,
                       void             *args)
 {
     int ret = 0;
-    SER_ASSERT(serial != RT_NULL);
+    GSI_ASSERT(serial != GSI_NULL);
    
     switch (cmd)
     {
@@ -477,7 +476,7 @@ int serial_control(struct serial_device* serial,
  */
 int hw_serial_register(struct serial_device    *serial,
                         const char              *name,
-                        uint32_t                flag,
+                        s_uint16_t                flag,
                         void                   *data)						   
 {
     int ret = 0;
@@ -502,7 +501,7 @@ int hw_serial_register(struct serial_device    *serial,
 /* ISR for serial interrupt */
 void hw_serial_isr(struct serial_device *serial, int event)
 {
-  	uint8_t dma_rx_ind = 1;
+  	s_uint8_t dma_rx_ind = 1;
     switch (event & 0xff)
     {
         case SERIAL_EVENT_RX_BYTE_IND:
@@ -528,7 +527,7 @@ void hw_serial_isr(struct serial_device *serial, int event)
             if (serial->rx_indicate != NULL && 
 				0 == (serial->open_flag & SERIAL_FLAG_INT_IDLE_RX))
             {
-                uint16_t rx_length;
+                s_uint16_t rx_length;
 
                 /* get rx length */
                 hw_interrupt_disable();
@@ -547,7 +546,7 @@ void hw_serial_isr(struct serial_device *serial, int event)
 			/* invoke callback */
             if (serial->rx_indicate != NULL)
             {
-                uint16_t rx_length;
+                s_uint16_t rx_length;
 
                 /* get rx length */
                 hw_interrupt_disable();
@@ -563,7 +562,7 @@ void hw_serial_isr(struct serial_device *serial, int event)
 		}
 		case SERIAL_EVENT_TX_DONE:
         {
-		    uint8_t ch;
+		    s_uint8_t ch;
  			if(ringbuffer_getchar(&serial->tx_fifo_rb , &ch))
 			{
 				serial->ops->putc(serial , ch);
@@ -572,9 +571,9 @@ void hw_serial_isr(struct serial_device *serial, int event)
         }
         case SERIAL_EVENT_TX_DMADONE:
         {
-            uint16_t data_size;
-            uint8_t last_data_ptr[1024];
-			uint8_t data_ptr[1024];
+            s_uint16_t data_size;
+            s_uint8_t last_data_ptr[1024];
+			s_uint8_t data_ptr[1024];
 
             data_queue_pop(&serial->tx_data_queue , last_data_ptr, &data_size);
             if (data_queue_peak(&serial->tx_data_queue, data_ptr, &data_size) == 0)

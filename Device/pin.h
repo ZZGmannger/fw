@@ -2,7 +2,7 @@
 #ifndef PIN_H
 #define PIN_H
 
-#include "main.h"
+#include "gsi_def.h"
 
 #define PIN_LOW                 0x00
 #define PIN_HIGH                0x01
@@ -30,29 +30,29 @@ struct device_pin
 
 struct pin_ops
 {
-	void (*pin_mode)(uint8_t pin, uint8_t mode);
-    void (*pin_write)(uint8_t pin, uint8_t value);
-    int (*pin_read)(uint8_t pin);
+	void (*pin_mode)(s_uint8_t pin, s_uint8_t mode);
+    void (*pin_write)(s_uint8_t pin, s_uint8_t value);
+    s_err_t (*pin_read)(s_uint8_t pin);
 
-    int (*pin_attach_irq)(uint8_t pin ,uint8_t mode, void (*hdr)(void *args), void *args);              
-    int (*pin_detach_irq)(uint8_t pin);
-    int (*pin_irq_enable)(uint8_t pin, uint8_t enabled);
+    s_err_t (*pin_attach_irq)(s_uint8_t pin ,s_uint8_t mode, void (*hdr)(void *args), void *args);              
+    s_err_t (*pin_detach_irq)(s_uint8_t pin);
+    s_err_t (*pin_irq_enable)(s_uint8_t pin, s_uint8_t enabled);
 };
  
 struct pin_irq_hdr
 {
-    int16_t        pin;
-    uint16_t       mode;
+    s_int16_t        pin;
+    s_uint16_t       mode;
     void (*hdr)(void *args);
     void             *args;
 };
 
-int pin_read(uint8_t pin);
-void pin_write(uint8_t pin, uint8_t value);
-void pin_mode(uint8_t pin, uint8_t mode);
-int pin_irq_enable(uint8_t pin, uint8_t enabled);
-int pin_attach_irq(uint8_t pin, uint8_t mode,void (*hdr)(void *args), void  *args);
-int pin_detach_irq(uint8_t pin);
+s_err_t pin_read(s_uint8_t pin);
+void pin_write(s_uint8_t pin, s_uint8_t value);
+void pin_mode(s_uint8_t pin, s_uint8_t mode);
+s_err_t pin_irq_enable(s_uint8_t pin, s_uint8_t enabled);
+s_err_t pin_attach_irq(s_uint8_t pin, s_uint8_t mode,void (*hdr)(void *args), void  *args);
+s_err_t pin_detach_irq(s_uint8_t pin);
 
 void device_pin_register(const char* name ,const struct pin_ops* ops);
 

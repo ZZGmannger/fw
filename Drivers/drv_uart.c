@@ -386,44 +386,44 @@ static void dma_isr(struct serial_device *serial)
 
 void USART1_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     uart_isr(&(uart_obj[UART1_INDEX].serial));
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void UART1_DMA_RX_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_DMA_IRQHandler(&uart_obj[UART1_INDEX].dma_rx.handle);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void UART1_DMA_TX_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_DMA_IRQHandler(&uart_obj[UART1_INDEX].dma_tx.handle);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void USART2_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     uart_isr(&(uart_obj[UART2_INDEX].serial));
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void UART2_DMA_RX_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_DMA_IRQHandler(&uart_obj[UART2_INDEX].dma_rx.handle);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 void UART2_DMA_TX_IRQHandler(void)
 {
-    interrupt_enter();
+    hw_interrupt_enter();
     HAL_DMA_IRQHandler(&uart_obj[UART2_INDEX].dma_tx.handle);
-    interrupt_leave();
+    hw_interrupt_leave();
 }
 
 static void stm32_dma_config(struct serial_device *serial, uint32_t flag)
