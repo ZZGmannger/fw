@@ -46,10 +46,12 @@ s_err_t data_queue_pop(struct data_queue *queue , void *data_ptr , s_uint16_t *s
 
 s_err_t data_queue_peak(struct data_queue *queue, void *data_ptr , s_uint16_t *size)
 {
+    s_uint16_t length;
 	if(queue->num)
 	{
-		ringbuffer_get(&queue->rb , (s_uint8_t *)(size) , 2);
-		ringbuffer_get(&queue->rb , (s_uint8_t *)data_ptr , *size);
+		ringbuffer_peak(&queue->rb , (s_uint8_t *)&length , 2);
+		ringbuffer_peak(&queue->rb , (s_uint8_t *)data_ptr , length+2);
+        *size = length;
 		return 0;
 	}
 	return -1;

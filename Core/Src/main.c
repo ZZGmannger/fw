@@ -54,6 +54,8 @@ int main(void)
     elog_set_fmt(ELOG_LVL_DEBUG,  ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
     elog_set_fmt(ELOG_LVL_VERBOSE,ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME|ELOG_FMT_FUNC|ELOG_FMT_LINE);
     /* start EasyLogger */
+   // elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_WARN);
+    
     elog_start();
 	
     while (1)
@@ -68,11 +70,14 @@ int main(void)
 char nn[]={"Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!\r\n"};
 void elog_port_output(const char *log, size_t size);
 void test_elog(void) {
-    /* test log output for all level */
-	elog_port_output(nn ,sizeof(nn) ) ;
-	elog_port_output(nn ,sizeof(nn) ) ;
-	elog_port_output(nn ,sizeof(nn) ) ;
-//  LOG_E("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
+  
+//    elog_port_output("Hello EasyLog1\r\n" , 16);
+//    elog_port_output("Hello EasyLog2\r\n" , 16);
+//    elog_port_output("Hello EasyLog3\r\n" , 16);
+    LOG_E("1)Hello EasyLog");
+    LOG_E("2)Hello EasyLog");
+    LOG_E("3)Hello EasyLog");
+
 // 	LOG_W("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
 // 	LOG_I("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
 // 	LOG_D("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");

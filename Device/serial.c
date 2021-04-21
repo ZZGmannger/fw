@@ -580,7 +580,7 @@ void hw_serial_isr(struct serial_device *serial, int event)
             {
                 /* transmit next data node */
                 serial->tx_dma_activated = 1;
-                serial->ops->dma_transmit(serial, data_ptr, data_size, SERIAL_DMA_TX);
+                serial->ops->dma_transmit(serial, data_ptr+2, data_size, SERIAL_DMA_TX);
             }
             else
             {
