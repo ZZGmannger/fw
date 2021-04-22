@@ -2,62 +2,118 @@
 #include "dataqueue.h"
 
 
-s_err_t data_queue_init(struct data_queue *queue , void* buffer , s_uint16_t size)
+struct data_item
 {
-	ringbuffer_init(&queue->rb , (s_uint8_t*)buffer, size);
-	return 0;
-}
-s_err_t data_queue_push(struct data_queue *queue , const void *data, s_uint16_t size)
+    const void *data_ptr;
+    s_size_t data_size;
+};
+
+
+s_err_t data_queue_init(struct data_queue *queue,
+                          s_uint16_t size,
+                          void (*evt_notify)(struct data_queue *queue, s_uint32_t event))
 {
-  	s_uint16_t remain;
-	s_uint16_t length;
-	s_uint8_t ch;
-	
-	remain = queue->rb.buffer_size - ringbuffer_data_len(&queue->rb);
-	
-	while(size > remain)
-	{
-		ringbuffer_get(&queue->rb , (s_uint8_t *)(&length) , 2);
-		while(length--)
-		{
-			ringbuffer_getchar(&queue->rb , &ch);
-		}
-		remain = queue->rb.buffer_size - ringbuffer_data_len(&queue->rb);
-	}
-	
-	ringbuffer_put(&queue->rb, (s_uint8_t *)&size, 2);
-	ringbuffer_put(&queue->rb, (s_uint8_t *)data, size);
-	
-	queue->num++;
-	return 0;
+    GSI_ASSERT(queue != GSI_NULL);
+
+    queue->evt_notify = evt_notify;
+
+    queue->size = size;
+
+    queue->get_index = 0;
+    queue->put_index = 0;
+
+    queue->queue = (struct data_item *)malloc(sizeof(struct data_item) * size);
+    if (queue->queue == GSI_NULL)
+    {
+        return -1;
+    }
+
+    return 0;
 }
 
-s_err_t data_queue_pop(struct data_queue *queue , void *data_ptr , s_uint16_t *size)
+s_err_t data_queue_push(struct data_queue *queue,
+                            const void *data_ptr,
+                            s_size_t data_size )
+                           
 {
-  	if(queue->num)
-	{
-		ringbuffer_get(&queue->rb , (s_uint8_t *)(size) , 2);
-		ringbuffer_get(&queue->rb , (s_uint8_t *)data_ptr , *size);
-		queue->num--;
-		return 0;
-	}
-	return -1;
+    s_err_t    result;
+    
+    GSI_ASSERT(queue != GSI_NULL);
+
+    result = 0;
+
+    hw_interrupt_disable();
+    while (queue->put_index - queue->get_index == queue->size)
+    {
+       
+    }
+
+    queue->queue[queue->put_index % queue->size].data_ptr  = data_ptr;
+    queue->queue[queue->put_index % queue->size].data_size = data_size;
+    queue->put_index += 1;
+    
+    hw_interrupt_enable();
+    if (queue->evt_notify != GSI_NULL)
+    {
+        queue->evt_notify(queue, DATAQUEUE_EVENT_PUSH);
+    }
+
+    return result;
 }
 
-s_err_t data_queue_peak(struct data_queue *queue, void *data_ptr , s_uint16_t *size)
+s_err_t data_queue_pop(struct data_queue *queue,
+                           const void** data_ptr,
+                           s_size_t *size)
+                          
 {
-    s_uint16_t length;
-	if(queue->num)
-	{
-		ringbuffer_peak(&queue->rb , (s_uint8_t *)&length , 2);
-		ringbuffer_peak(&queue->rb , (s_uint8_t *)data_ptr , length+2);
-        *size = length;
-		return 0;
-	}
-	return -1;
+    s_err_t    result;
+
+    GSI_ASSERT(queue != GSI_NULL);
+    GSI_ASSERT(data_ptr != GSI_NULL);
+    GSI_ASSERT(size != GSI_NULL);
+
+    result = 0;
+    hw_interrupt_disable();
+    while (queue->get_index == queue->put_index)
+    {
+        /* queue is empty */
+    }
+
+    *data_ptr = queue->queue[queue->get_index % queue->size].data_ptr;
+    *size     = queue->queue[queue->get_index % queue->size].data_size;
+
+    queue->get_index += 1;
+
+    hw_interrupt_enable();
+    if (queue->evt_notify != GSI_NULL)
+    {
+        queue->evt_notify(queue, DATAQUEUE_EVENT_POP);
+    }
+
+    return result;
 }
 
-void data_queue_reset(struct data_queue *queue)
+s_err_t data_queue_peak(struct data_queue *queue,
+                            const void** data_ptr,
+                            s_size_t *size)
 {
-	
+    GSI_ASSERT(queue != GSI_NULL);
+
+    hw_interrupt_disable();
+
+    if (queue->get_index == queue->put_index) 
+    {
+        hw_interrupt_enable();
+        
+        return -1;
+    }
+
+    *data_ptr = queue->queue[queue->get_index % queue->size].data_ptr;
+    *size     = queue->queue[queue->get_index % queue->size].data_size;
+
+    hw_interrupt_enable();
+
+    return 0;
 }
+
+

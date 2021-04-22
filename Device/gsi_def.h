@@ -143,7 +143,7 @@ typedef s_ubase_t                      	s_size_t;      /**< Type for size number
  * would return 12.
  */
 #define GSI_ALIGN_DOWN(size, align)      ((size) & ~((align) - 1))
-
+     
  
 #define s_memcpy           memcpy
 #define s_memcmp           memcmp
