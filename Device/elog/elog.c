@@ -523,11 +523,11 @@ void elog_output(uint8_t level, const char *tag, const char *file, const char *f
         return;
     }
     /* level filter */
-//    if (level > elog.filter.level || level > elog_get_filter_tag_lvl(tag)) {
-//        return;
-//    } else if (NULL!=strstr(tag, elog.filter.tag)) { /* tag filter */
-//        return;
-//    }
+    if (level > elog.filter.level || level > elog_get_filter_tag_lvl(tag)) {
+        return;
+    } else if (strlen(elog.filter.tag) && strstr(tag, elog.filter.tag)) { /* tag filter */
+        return;
+    }
     /* args point to the first variable parameter */
     va_start(args, format);
     /* lock output */

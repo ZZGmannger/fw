@@ -69,14 +69,32 @@ int main(void)
  */
 char nn[]={"Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!\r\n"};
 void elog_port_output(const char *log, size_t size);
+
+ 
 void test_elog(void) {
   
-//    elog_port_output("Hello EasyLog1\r\n" , 16);
-//    elog_port_output("Hello EasyLog2\r\n" , 16);
-//    elog_port_output("Hello EasyLog3\r\n" , 16);
-    LOG_E("1)Hello EasyLog");
-    LOG_E("2)Hello EasyLog");
-    LOG_E("3)Hello EasyLog");
+
+  	hw_interrupt_disable();
+    elog_port_output("EasyLog1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\r\n" , 103);
+    hw_interrupt_enable();
+	
+	hw_interrupt_disable();
+	elog_port_output("EasyLog2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222\r\n" , 103);
+	hw_interrupt_enable();
+	
+	hw_interrupt_disable();
+	elog_port_output("EasyLog3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333\r\n" , 103);
+	hw_interrupt_enable();
+//    elog_port_output("Hello EasyLog4\r\n" , 16);
+//    elog_port_output("Hello EasyLog5\r\n" , 16);
+//    elog_port_output("Hello EasyLog6\r\n" , 16);
+//	
+//    elog_port_output("Hello EasyLog7\r\n" , 16);
+//    elog_port_output("Hello EasyLog8\r\n" , 16);
+//    elog_port_output("Hello EasyLog9\r\n" , 16);
+//    LOG_E("Hello EasyLog1");
+//    LOG_E("Hello EasyLog2");
+//    LOG_E("Hello EasyLog3");
 
 // 	LOG_W("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
 // 	LOG_I("Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!");
