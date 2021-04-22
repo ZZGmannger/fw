@@ -86,6 +86,11 @@ typedef enum
 #define  SENSOR_CTRL_SET_POWER      (5)  /* Set power mode. args type of sensor power mode. ex. SENSOR_POWER_DOWN,SENSOR_POWER_NORMAL */
 #define  SENSOR_CTRL_SELF_TEST      (6)  /* Take a self test */
 
+/* Sensor open flag types */
+#define SENSOR_FLAG_RDONLY     (0x0001)
+#define SENSOR_FLAG_INT_RX     (0x0002)
+#define SENSOR_FLAG_FIFO_RX    (0x0004)
+
 struct sensor_info
 {
     s_uint8_t     type;                    /* The sensor type */
@@ -160,9 +165,20 @@ struct sensor_ops
     s_err_t (*control)(struct sensor_device *sensor, int cmd, void *arg);
 };
 
+
+struct sensor_device* sensor_find(const char* name);
+s_err_t sensor_open(struct sensor_device* sensor , s_uint16_t oflag);
+s_err_t sensor_close(struct sensor_device* sensor);
+s_size_t sensor_read(struct sensor_device* sensor , void *buf , s_size_t len);
+s_err_t sensor_control(struct sensor_device* sensor, int cmd, void *args);
+
+
 int hw_sensor_register(struct sensor_device* sensor,
                           const char              *name,
                           s_uint32_t              flag,
                           void                    *data);
+
+
+ 
 
 #endif

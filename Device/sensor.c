@@ -11,9 +11,9 @@ static char *const sensor_name_str[] =
 };
 #undef X
 
-
- 
 static struct sensor_device _hw_sensor;
+
+
 
 struct sensor_device* sensor_find(const char* name)
 {
@@ -32,7 +32,7 @@ struct sensor_device* sensor_find(const char* name)
 }
 
 /* RT-Thread Device Interface */
-s_err_t sensor_open(struct sensor_device* sensor , uint16_t oflag)
+s_err_t sensor_open(struct sensor_device* sensor , s_uint16_t oflag)
 {
     GSI_ASSERT(sensor !=  GSI_NULL);
     s_err_t res = 0;
@@ -55,7 +55,7 @@ s_err_t sensor_open(struct sensor_device* sensor , uint16_t oflag)
             sensor->ops->control(sensor, SENSOR_CTRL_SET_MODE, (void *)SENSOR_MODE_INT);
         }
         /* Initialization sensor interrupt */
-        rt_sensor_irq_init(sensor);
+        //rt_sensor_irq_init(sensor);
         sensor->config.mode =  SENSOR_MODE_INT;
     }
     else if (oflag & SENSOR_FLAG_FIFO_RX && sensor->init_flag & SENSOR_FLAG_FIFO_RX)
@@ -66,17 +66,17 @@ s_err_t sensor_open(struct sensor_device* sensor , uint16_t oflag)
             sensor->ops->control(sensor, SENSOR_CTRL_SET_MODE, (void *)SENSOR_MODE_FIFO);
         }
         /* Initialization sensor interrupt */
-        rt_sensor_irq_init(sensor);
+        //rt_sensor_irq_init(sensor);
         sensor->config.mode = SENSOR_MODE_FIFO;
     }
     else
     {
-        res = -EINVAL;
+        res = -1;
         goto __exit;
     }
 
     /* Configure power mode to normal mode */
-    if (sensor->ops->control(sensor, SENSOR_CTRL_SET_POWER, (void *)SENSOR_POWER_NORMAL) == EOK)
+    if (sensor->ops->control(sensor, SENSOR_CTRL_SET_POWER, (void *)SENSOR_POWER_NORMAL) == 0)
     {
         sensor->config.power = SENSOR_POWER_NORMAL;
     }
@@ -140,7 +140,7 @@ s_size_t sensor_read(struct sensor_device* sensor , void *buf , s_size_t len)
     return result;
 }
 
-static s_err_t sensor_control(struct sensor_device* sensor, int cmd, void *args)
+s_err_t sensor_control(struct sensor_device* sensor, int cmd, void *args)
 {
     s_err_t result = 0;
     GSI_ASSERT(sensor != GSI_NULL);
