@@ -47,7 +47,7 @@ ElogErrCode elog_port_init(void) {
 	  	struct serial_configure cfg = SERIAL_CONFIG_DEFAULT;
 	    cfg.baud_rate = 115200;
 		serial_control(log_uart  , DEVICE_CTRL_CONFIG , &cfg);
-		serial_open(log_uart ,   SERIAL_FLAG_DMA_TX);
+		serial_open(log_uart ,   SERIAL_FLAG_INT_TX);
 	}
     
     return result;

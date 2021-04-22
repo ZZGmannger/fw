@@ -1085,6 +1085,9 @@
                 <name>$PROJ_DIR$\..\Device\pin.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Device\sensor.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Device\serial.c</name>
             </file>
         </group>
