@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.32.2.19370</state>
+                    <state>8.30.1.17146</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -116,7 +116,7 @@
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
-                    <version>27</version>
+                    <version>26</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -133,7 +133,7 @@
                 </option>
                 <option>
                     <name>CoreVariant</name>
-                    <version>27</version>
+                    <version>26</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -156,7 +156,7 @@
                 </option>
                 <option>
                     <name>GFPUCoreSlave2</name>
-                    <version>27</version>
+                    <version>26</version>
                     <state>38</state>
                 </option>
                 <option>
@@ -215,13 +215,14 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>35</version>
+                <version>34</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
                     <state>USE_HAL_DRIVER</state>
                     <state>STM32F103xB</state>
+                    <state>USING_INIT_EXPORT</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -351,9 +352,11 @@
                     <state>$PROJ_DIR$/../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy</state>
                     <state>$PROJ_DIR$/../Drivers/CMSIS/Device/ST/STM32F1xx/Include</state>
                     <state>$PROJ_DIR$/../Drivers/CMSIS/Include</state>
-                    <state>$PROJ_DIR$\..\Device</state>
+                    <state>$PROJ_DIR$\..\GSI\Components\elog</state>
+                    <state>$PROJ_DIR$\..\GSI\Device</state>
+                    <state>$PROJ_DIR$\..\GSI\Utility</state>
+                    <state>$PROJ_DIR$\..\GSI</state>
                     <state>$PROJ_DIR$\..\Drivers</state>
-                    <state>$PROJ_DIR$\..\Device\elog</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -470,10 +473,6 @@
                 <option>
                     <name>IccRTTI2</name>
                     <state>0</state>
-                </option>
-                <option>
-                    <name>OICompilerExtraOption</name>
-                    <state>1</state>
                 </option>
             </data>
         </settings>
@@ -695,7 +694,7 @@
             <name>ILINK</name>
             <archiveVersion>0</archiveVersion>
             <data>
-                <version>22</version>
+                <version>21</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -1011,10 +1010,6 @@
                     <name>IlinkTrustzoneImportLibraryOut</name>
                     <state>fw_import_lib.o</state>
                 </option>
-                <option>
-                    <name>OILinkExtraOption</name>
-                    <state>1</state>
-                </option>
             </data>
         </settings>
         <settings>
@@ -1060,6 +1055,9 @@
         <group>
             <name>User</name>
             <file>
+                <name>$PROJ_DIR$\..\Core\Src\Appsenso_temp.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Core\Src\main.c</name>
             </file>
             <file>
@@ -1075,42 +1073,51 @@
         <group>
             <name>Components</name>
             <file>
-                <name>$PROJ_DIR$\..\Device\elog\elog.c</name>
+                <name>$PROJ_DIR$\..\GSI\Components\elog\elog.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Device\elog\elog_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Device\elog\elog_port.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Device\elog\elog_utils.c</name>
+                <name>$PROJ_DIR$\..\GSI\Components\elog\elog_port.c</name>
             </file>
         </group>
         <group>
-            <name>DeviceDriver</name>
+            <name>Device</name>
             <file>
-                <name>$PROJ_DIR$\..\Device\pin.c</name>
+                <name>$PROJ_DIR$\..\GSI\Device\pin.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Device\sensor.c</name>
+                <name>$PROJ_DIR$\..\GSI\Device\sensor.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Device\serial.c</name>
+                <name>$PROJ_DIR$\..\GSI\Device\serial.c</name>
             </file>
         </group>
         <group>
             <name>Utility</name>
             <file>
-                <name>$PROJ_DIR$\..\Device\dataqueue.c</name>
+                <name>$PROJ_DIR$\..\GSI\Utility\dataqueue.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Device\list.c</name>
+                <name>$PROJ_DIR$\..\GSI\Utility\export.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Device\ringbuffer.c</name>
+                <name>$PROJ_DIR$\..\GSI\Utility\list.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Utility\ringbuffer.c</name>
             </file>
         </group>
+    </group>
+    <group>
+        <name>SensorDriver</name>
+        <file>
+            <name>$PROJ_DIR$\..\SensorDriver\drv_adxl345.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\SensorDriver\drv_sht21.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\SensorDriver\drv_th02.c</name>
+        </file>
     </group>
     <group>
         <name>STDrivers</name>

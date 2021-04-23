@@ -2,6 +2,7 @@
 #include "board.h"
 #include "drv_gpio.h"
 #include "drv_uart.h"
+#include "export.h"
 
 
 volatile static uint8_t irq_level;
@@ -169,6 +170,9 @@ void hw_board_init(void)
 {
 	SystemClock_Config();
 
-	hw_pin_init();
-	hw_usart_init();
+//	hw_pin_init();
+//	hw_usart_init();
+//	
+	board_auto_init();
+	components_auto_init();
 }

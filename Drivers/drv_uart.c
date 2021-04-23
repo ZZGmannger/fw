@@ -588,7 +588,6 @@ static void stm32_uart_get_dma_config(void)
 };
 
 
-
 int hw_usart_init(void)
 {
     uint16_t obj_num = sizeof(uart_obj) / sizeof(struct stm32_uart);
@@ -617,5 +616,5 @@ int hw_usart_init(void)
 
     return result;
 }
-
+INIT_BOARD_EXPORT(hw_usart_init);
 

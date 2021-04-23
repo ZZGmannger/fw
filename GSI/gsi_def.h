@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "export.h"
+ 
 
 typedef signed   char                   s_int8_t;      /**<  8bit integer type */
 
@@ -100,26 +102,6 @@ typedef s_ubase_t                      	s_size_t;      /**< Type for size number
 #else
     #error not supported tool chain
 #endif
-
-		
-/* initialization export */	
-#ifdef USING_INIT_EXPORT
-	typedef int (*init_fn_t)(void);
-	#define INIT_EXPORT(fn, level)						\
-            GSI_USED const init_fn_t __init_##fn GSI_SECTION(".rti_fn." level) = fn
-#else
-	#define INIT_EXPORT(fn, level)
-#endif
-
-/* board init routines will be called in board_init() function */
-#define INIT_BOARD_EXPORT(fn)           INIT_EXPORT(fn, "1")
-/* device initialization */
-#define INIT_DEVICE_EXPORT(fn)          INIT_EXPORT(fn, "2")
-/* components initialization (dfs, lwip, ...) */
-#define INIT_COMPONENT_EXPORT(fn)       INIT_EXPORT(fn, "3")
-/* appliation initialization (rtgui application etc ...) */
-#define INIT_APP_EXPORT(fn)             INIT_EXPORT(fn, "4")
-
 
 			  
 #define rt_container_of(ptr, type, member) \

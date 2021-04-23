@@ -1,15 +1,16 @@
 
 #include "main.h"
+#define LOG_TAG    "UTtest"
+#include <elog.h>
 
 #include "board.h"
 #include "pin.h"
 #include "serial.h"
 
+#include "export.h"
+
 #define LED_PIN    (50)
 #define KEY_PIN    (0)
-
-#define LOG_TAG    "UTtest"
-#include <elog.h>
 
 
 void key_press_hander(void *args)
@@ -41,7 +42,17 @@ int main(void)
     pin_mode(KEY_PIN , PIN_MODE_INPUT_PULLUP);
     pin_attach_irq(KEY_PIN , PIN_IRQ_MODE_FALLING , key_press_hander , NULL);
     pin_irq_enable(KEY_PIN ,PIN_IRQ_ENABLE);  
-
+	
+    while (1)
+    {
+	   	test_auto_run();
+    }
+}
+/**
+ * EasyLogger demo
+ */
+int test_elog_init(void)
+{
 	/* initialize EasyLogger */
     elog_init();
 	
@@ -57,22 +68,12 @@ int main(void)
    // elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_WARN);
     
     elog_start();
-	
-    while (1)
-    {
-	   	test_elog();
-        HAL_Delay(3000);
-    }
+	return 0;
 }
-/**
- * EasyLogger demo
- */
-char nn[]={"Hello EasyLog============++++++++++++++++//////////////////QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQGGGGGGGGGGGGGG!\r\n"};
-void elog_port_output(const char *log, size_t size);
+INIT_COMPONENT_EXPORT(test_elog_init);
 
- 
 void test_elog(void) {
-  
+  void elog_port_output(const char *log, size_t size);
 //
 //  	hw_interrupt_disable();
 //    elog_port_output("EasyLog1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\r\n" , 103);
@@ -100,5 +101,6 @@ void test_elog(void) {
  	LOG_I("EasyLog3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333");
  	LOG_D("EasyLog4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444");
  	LOG_V("EasyLog5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555");
-
+	HAL_Delay(3000);
 }
+//RUN_TEST_EXPORT(test_elog);

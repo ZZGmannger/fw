@@ -319,7 +319,8 @@ int serial_open(struct serial_device* serial, s_uint16_t oflag)
 	}
 	else if (oflag & SERIAL_FLAG_DMA_TX)
 	{
-		data_queue_init(&serial->tx_data_queue , serial->tx_buffer , serial->config.txbufsz);  
+	  	//TODO:dataqueue
+		//data_queue_init(&serial->tx_data_queue , serial->tx_buffer , serial->config.txbufsz);  
 		serial->open_flag |= SERIAL_FLAG_DMA_TX;
 		/* configure low level device */
 		serial->ops->control(serial, DEVICE_CTRL_CONFIG, (void *)SERIAL_FLAG_DMA_TX);
@@ -571,27 +572,28 @@ void hw_serial_isr(struct serial_device *serial, int event)
         }
         case SERIAL_EVENT_TX_DMADONE:
         {
-            s_uint16_t data_size;
-            s_uint8_t last_data_ptr[1024];
-			s_uint8_t data_ptr[1024];
-
-            data_queue_pop(&serial->tx_data_queue , last_data_ptr, &data_size);
-            if (data_queue_peak(&serial->tx_data_queue, data_ptr, &data_size) == 0)
-            {
-                /* transmit next data node */
-                serial->tx_dma_activated = 1;
-                serial->ops->dma_transmit(serial, data_ptr+2, data_size, SERIAL_DMA_TX);
-            }
-            else
-            {
-                serial->tx_dma_activated = 0;
-            }
-
-            /* invoke callback */
-            if (serial->tx_complete != NULL)
-            {
-                serial->tx_complete(serial, (void*)last_data_ptr);
-            }
+//            s_uint16_t data_size;
+//            s_uint8_t last_data_ptr[8];
+//			s_uint8_t data_ptr[8];
+			//TODO:dataqueue
+            //data_queue_pop(&serial->tx_data_queue , last_data_ptr, &data_size);
+            //if (data_queue_peak(&serial->tx_data_queue, data_ptr, &data_size) == 0)
+//			if(1)
+//            {
+//                /* transmit next data node */
+//                serial->tx_dma_activated = 1;
+//                serial->ops->dma_transmit(serial, data_ptr+2, data_size, SERIAL_DMA_TX);
+//            }
+//            else
+//            {
+//                serial->tx_dma_activated = 0;
+//            }
+//
+//            /* invoke callback */
+//            if (serial->tx_complete != NULL)
+//            {
+//                serial->tx_complete(serial, (void*)last_data_ptr);
+//            }
             break;
         }
 		case SERIAL_EVENT_RX_DMAHALF:

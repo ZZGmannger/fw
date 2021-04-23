@@ -592,5 +592,5 @@ int hw_pin_init(void)
 	device_pin_register("pin" ,  &_stm32_pin_ops);
 	return 0;
 }
-
+INIT_BOARD_EXPORT(hw_pin_init);
 
