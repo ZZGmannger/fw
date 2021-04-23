@@ -124,8 +124,6 @@ struct sensor_config
     s_int32_t                   range;     /* sensor range of measurement */
 };
 
-
-
 struct sensor_device
 {
   	struct sensor_device* next;

@@ -19,6 +19,14 @@ int SensorAppTest_init(void)
 		return -1;
 	}
 	sensor_open(shtxx_sensor , SENSOR_FLAG_RDONLY);
+	
+	LOG_D("sensor info name: %s" , shtxx_sensor->info.name);
+	LOG_D("sensor info vendor: %d" , shtxx_sensor->info.vendor);
+	LOG_D("sensor info intf_type: %d" , shtxx_sensor->info.intf_type);
+	LOG_D("sensor info argc: %d" , shtxx_sensor->info.argc);
+	
+	LOG_D("sensor info param1 type: %d" , shtxx_sensor->info.param[0].type);
+	LOG_D("sensor info param2 type: %d" , shtxx_sensor->info.param[1].type);
 
 	return 0;
 }
