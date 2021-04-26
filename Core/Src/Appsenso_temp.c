@@ -30,7 +30,7 @@ int SensorAppTest_init(void)
 
 	return 0;
 }
-INIT_TEST_EXPORT(SensorAppTest_init);
+//INIT_TEST_EXPORT(SensorAppTest_init);
 
 void SensorAppTest_poll(void)
 {
@@ -44,4 +44,4 @@ void SensorAppTest_poll(void)
 
 	HAL_Delay(1000);
 }
-RUN_TEST_EXPORT(SensorAppTest_poll);
+//RUN_TEST_EXPORT(SensorAppTest_poll);

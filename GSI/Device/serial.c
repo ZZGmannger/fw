@@ -105,14 +105,18 @@ GSI_INLINE int _serial_int_tx(struct serial_device *serial,
     size = length;
     
 	hw_interrupt_disable();
-	if(0 == ringbuffer_data_len(&serial->tx_fifo_rb))
+	if(!serial->tx_int_activated && 0 == ringbuffer_data_len(&serial->tx_fifo_rb))
 	{
 		serial->ops->putc(serial , *data);
+        serial->tx_int_activated =1;
 		--length;
 		++data;
 	}
-  
- 	length -= ringbuffer_put(&serial->tx_fifo_rb, data , length);
+    if(length)
+    {
+        length -= ringbuffer_put(&serial->tx_fifo_rb, data , length);
+    }
+ 
     hw_interrupt_enable();
     
     return size - length;
@@ -568,6 +572,10 @@ void hw_serial_isr(struct serial_device *serial, int event)
 			{
 				serial->ops->putc(serial , ch);
 			}
+            else
+            {
+               serial->tx_int_activated = 0;
+            }
             break;
         }
         case SERIAL_EVENT_TX_DMADONE:

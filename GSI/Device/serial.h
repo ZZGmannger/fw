@@ -77,7 +77,7 @@
 
 /* Default config for serial_configure structure */
 #define SERIAL_RB_BUFSZ     1024
-#define SERIAL_TB_BUFSZ     1024
+#define SERIAL_TB_BUFSZ     2048
 
 #define SERIAL_CONFIG_DEFAULT           \
 {                                          \
@@ -124,6 +124,7 @@ struct serial_device
     s_uint16_t ref_count;
     s_uint8_t tx_dma_activated;
     s_uint8_t rx_dma_activated;
+    s_uint8_t tx_int_activated;
 	
 	struct ringbuffer rx_fifo_rb;
 	struct ringbuffer tx_fifo_rb;

@@ -29,7 +29,7 @@
 #include <elog.h>
 #include "serial.h"
 
-#define LOG_UART     "uart2"
+#define LOG_UART     "uart1"
 
 struct serial_device*  log_uart;
 
@@ -41,14 +41,14 @@ struct serial_device*  log_uart;
 ElogErrCode elog_port_init(void) {
     ElogErrCode result = ELOG_NO_ERR;
 
-    log_uart = serial_find(LOG_UART);
-	if(log_uart != NULL)
-	{
-	  	struct serial_configure cfg = SERIAL_CONFIG_DEFAULT;
-	    cfg.baud_rate = 115200;
-		serial_control(log_uart  , DEVICE_CTRL_CONFIG , &cfg);
-		serial_open(log_uart ,   SERIAL_FLAG_INT_TX);
-	}
+//    log_uart = serial_find(LOG_UART);
+//	if(log_uart != NULL)
+//	{
+//	  	struct serial_configure cfg = SERIAL_CONFIG_DEFAULT;
+//	    cfg.baud_rate = 1200;
+//		serial_control(log_uart  , DEVICE_CTRL_CONFIG , &cfg);
+//		serial_open(log_uart ,   SERIAL_FLAG_INT_TX);
+//	}
     
     return result;
 }
@@ -62,7 +62,9 @@ ElogErrCode elog_port_init(void) {
 void elog_port_output(const char *log, size_t size) {
     
     /* add your code here */
-	serial_write(log_uart , log, size);
+	//serial_write(log_uart , log, size);
+    void shell_put(const char* buf , uint16_t len);
+    shell_put(log , size);
 }
 
 /**
