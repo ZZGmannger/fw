@@ -29,7 +29,7 @@
 #include <elog.h>
 #include "serial.h"
 
-#define LOG_UART     "uart1"
+#define LOG_UART     "uart2"
 
 struct serial_device*  log_uart;
 

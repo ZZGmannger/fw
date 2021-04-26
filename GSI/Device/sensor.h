@@ -6,21 +6,21 @@
 
 
 #define SENSOR_OBJ \
-	 /*name             type                    data                             description*/ \
-	X("none"  ,  SENSOR_CLASS_NONE      , s_uint8_t no_use) \
-    X("acce_" ,  SENSOR_CLASS_ACCE      , struct sensor_3_axis acce)		/* Accelerometer     */ \
-    X("gyro_" ,  SENSOR_CLASS_GYRO      , struct sensor_3_axis gyro)		/* Gyroscope         */ \
-    X("mag_"  ,  SENSOR_CLASS_MAG       , struct sensor_3_axis magn)		/* Magnetometer      */ \
-    X("temp_" ,  SENSOR_CLASS_TEMP      , s_int32_t            temp)		/* Temperature       */ \
-    X("humi_" ,  SENSOR_CLASS_HUMI      , s_int32_t            humi)		/* Relative Humidity */ \
-    X("baro_" ,  SENSOR_CLASS_BARO      , s_int32_t            baro)		/* Barometer         */ \
-    X("li_"   ,  SENSOR_CLASS_LIGHT     , s_int32_t            light)		/* Ambient light     */ \
-    X("pr_"   ,  SENSOR_CLASS_PROXIMITY , s_int32_t            proximity)	/* Proximity         */ \
-    X("hr_"   ,  SENSOR_CLASS_HR        , s_int32_t            hr)		    /* Heart Rate        */ \
-    X("tvoc_" ,  SENSOR_CLASS_TVOC      , s_int32_t            tvoc)		/* TVOC Level        */ \
-    X("noi_"  ,  SENSOR_CLASS_NOISE     , s_int32_t            noise)		/* Noise Loudness    */ \
-    X("step_" ,  SENSOR_CLASS_STEP      , s_uint32_t           step)		/* Step sensor       */ \
-    X("forc_" ,  SENSOR_CLASS_FORCE     , s_int32_t            force)		/* Force sensor      */ \
+	 /*name             type                  physical  data                     description*/ \
+	X("none" ,  SENSOR_CLASS_NONE      , s_uint8_t no_use) \
+    X("acce" ,  SENSOR_CLASS_ACCE      , struct sensor_3_axis acce)		/* Accelerometer     */ \
+    X("gyro" ,  SENSOR_CLASS_GYRO      , struct sensor_3_axis gyro)		/* Gyroscope         */ \
+    X("mag"  ,  SENSOR_CLASS_MAG       , struct sensor_3_axis magn)		/* Magnetometer      */ \
+    X("temp" ,  SENSOR_CLASS_TEMP      , s_int32_t            temp)		/* Temperature       */ \
+    X("humi" ,  SENSOR_CLASS_HUMI      , s_int32_t            humi)		/* Relative Humidity */ \
+    X("baro" ,  SENSOR_CLASS_BARO      , s_int32_t            baro)		/* Barometer         */ \
+    X("li"   ,  SENSOR_CLASS_LIGHT     , s_int32_t            light)	/* Ambient light     */ \
+    X("pr"   ,  SENSOR_CLASS_PROXIMITY , s_int32_t            proximity)/* Proximity         */ \
+    X("hr"   ,  SENSOR_CLASS_HR        , s_int32_t            hr)		/* Heart Rate        */ \
+    X("tvoc" ,  SENSOR_CLASS_TVOC      , s_int32_t            tvoc)		/* TVOC Level        */ \
+    X("noi"  ,  SENSOR_CLASS_NOISE     , s_int32_t            noise)	/* Noise Loudness    */ \
+    X("step" ,  SENSOR_CLASS_STEP      , s_uint32_t           step)		/* Step sensor       */ \
+    X("forc" ,  SENSOR_CLASS_FORCE     , s_int32_t            force)	/* Force sensor      */ \
     /*----------------------------------add new sensor below-------------------------------------*/ \
 	  
 #define X(a, b ,c)	 b,  
@@ -29,16 +29,6 @@ typedef enum
 	SENSOR_OBJ
 }SENSOR_TYPE;
 #undef X
-
-/* Sensor vendor types */
-#define SENSOR_VENDOR_UNKNOWN       (0)
-#define SENSOR_VENDOR_STM           (1)  /* STMicroelectronics */
-#define SENSOR_VENDOR_BOSCH         (2)  /* Bosch */
-#define SENSOR_VENDOR_INVENSENSE    (3)  /* Invensense */
-#define SENSOR_VENDOR_SEMTECH       (4)  /* Semtech */
-#define SENSOR_VENDOR_GOERTEK       (5)  /* Goertek */
-#define SENSOR_VENDOR_MIRAMEMS      (6)  /* MiraMEMS */
-#define SENSOR_VENDOR_DALLAS        (7)  /* Dallas */
 
 /* Sensor unit types */
 #define  SENSOR_UNIT_NONE           (0)
@@ -56,13 +46,24 @@ typedef enum
 #define  SENSOR_UNIT_MM             (12) /* Distance                unit: mm         */
 #define  SENSOR_UNIT_MN             (13) /* Force                   unit: mN         */
 
+/* Sensor vendor types */
+#define SENSOR_VENDOR_UNKNOWN       (0)
+#define SENSOR_VENDOR_STM           (1)  /* STMicroelectronics */
+#define SENSOR_VENDOR_BOSCH         (2)  /* Bosch */
+#define SENSOR_VENDOR_INVENSENSE    (3)  /* Invensense */
+#define SENSOR_VENDOR_SEMTECH       (4)  /* Semtech */
+#define SENSOR_VENDOR_GOERTEK       (5)  /* Goertek */
+#define SENSOR_VENDOR_MIRAMEMS      (6)  /* MiraMEMS */
+#define SENSOR_VENDOR_DALLAS        (7)  /* Dallas */
+
 /* Sensor communication interface types */
 #define  SENSOR_INTF_I2C            (1 << 0)
 #define  SENSOR_INTF_SPI            (1 << 1)
 #define  SENSOR_INTF_UART           (1 << 2)
-#define  SENSOR_INTF_ONEWIRE        (1 << 3)
-#define  SENSOR_INTF_ADC            (1 << 4)
-#define  SENSOR_INTF_IO             (1 << 5)
+#define  SENSOR_INTF_CAN            (1 << 3)
+#define  SENSOR_INTF_ONEWIRE        (1 << 4)
+#define  SENSOR_INTF_ADC            (1 << 5)
+#define  SENSOR_INTF_IO             (1 << 6)
 
 /* Sensor power mode types */
 #define  SENSOR_POWER_NONE          (0)
@@ -81,13 +82,15 @@ typedef enum
 #define  SENSOR_CTRL_GET_ID         (0)  /* Get device id */
 #define  SENSOR_CTRL_GET_INFO       (1)  /* Get sensor info */
 
-#define  SENSOR_CTRL_SET_ARGC      (2)  /* Get device id */
+#define  SENSOR_CTRL_SET_RESET      (2)  /* Get device id */
+#define  SENSOR_CTRL_SET_ARGC       (2)  /* Get device id */
 #define  SENSOR_CTRL_SET_RANGE      (3)  /* Set the measure range of sensor. unit is info of sensor */
 #define  SENSOR_CTRL_SET_ODR        (4)  /* Set output date rate. unit is HZ */
 #define  SENSOR_CTRL_SET_MODE       (5)  /* Set sensor's work mode. ex. SENSOR_MODE_POLLING,SENSOR_MODE_INT */
 #define  SENSOR_CTRL_SET_POWER      (6)  /* Set power mode. args type of sensor power mode. ex. SENSOR_POWER_DOWN,SENSOR_POWER_NORMAL */
 #define  SENSOR_CTRL_SELF_TEST      (7)  /* Take a self test */
-#define SENSOR_CTRL_SET_IND         (8)
+#define  SENSOR_CTRL_SET_IND        (8)
+
 /* Sensor open flag types */
 #define SENSOR_FLAG_RDONLY     (0x0001)
 #define SENSOR_FLAG_INT_RX     (0x0002)
@@ -108,15 +111,14 @@ struct sensor_info
 {
 	const char    *name;                   /* model name of sensor */
 	s_uint8_t     vendor;                  /* Vendor of sensors */
-    s_uint8_t     intf_type;               /* Communication interface type */
+    s_uint8_t     intf_type;               /* Communication interface type */	
 	s_uint8_t     argc;                    /*indicate the sensor param num*/
-	
 	struct sensor_parameter* param;
 };
 
 struct sensor_config
 {
-   // struct sensor_intf         intf;      /* sensor interface config */
+	// struct sensor_intf         intf;      /* sensor interface config */
     s_uint8_t                   argc;
     s_uint8_t                   mode;      /* sensor work mode */
     s_uint8_t                   power;     /* sensor power mode */
@@ -129,6 +131,8 @@ struct sensor_device
   	struct sensor_device* next;
     struct sensor_info        info;      /* The sensor info data */
     struct sensor_config      config;    /* The sensor config data */
+	
+	s_uint32_t status;
 	
 	s_uint16_t init_flag;
 	s_uint16_t open_flag;
@@ -182,6 +186,5 @@ int hw_sensor_register(struct sensor_device* sensor,
                           void                    *data);
 
 
- 
 
 #endif

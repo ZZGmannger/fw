@@ -357,6 +357,7 @@
                     <state>$PROJ_DIR$\..\GSI\Utility</state>
                     <state>$PROJ_DIR$\..\GSI</state>
                     <state>$PROJ_DIR$\..\Drivers</state>
+                    <state>$PROJ_DIR$\..\GSI\Components\shell</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1078,9 +1079,27 @@
             <file>
                 <name>$PROJ_DIR$\..\GSI\Components\elog\elog_port.c</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Components\shell\shell.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Components\shell\shell_cmd_list.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Components\shell\shell_ext.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Components\shell\shell_port.c</name>
+            </file>
         </group>
         <group>
             <name>Device</name>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Device\i2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Device\i2c.h</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\GSI\Device\pin.c</name>
             </file>

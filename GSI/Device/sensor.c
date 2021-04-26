@@ -218,5 +218,5 @@ int hw_sensor_register(struct sensor_device* sensor,
 	sensor->next = NULL;
 	
     LOG_I("sensor init success");
-    return 0;
+    return result;
 }
