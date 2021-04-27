@@ -5,30 +5,81 @@
 #include "gsi_def.h"
 
 
-#define SENSOR_OBJ \
+#define SENSOR_PHY_TYPE \
 	 /*name             type                  physical  data                     description*/ \
 	X("none" ,  SENSOR_CLASS_NONE      , s_uint8_t no_use) \
     X("acce" ,  SENSOR_CLASS_ACCE      , struct sensor_3_axis acce)		/* Accelerometer     */ \
-    X("gyro" ,  SENSOR_CLASS_GYRO      , struct sensor_3_axis gyro)		/* Gyroscope         */ \
-    X("mag"  ,  SENSOR_CLASS_MAG       , struct sensor_3_axis magn)		/* Magnetometer      */ \
     X("temp" ,  SENSOR_CLASS_TEMP      , s_int32_t            temp)		/* Temperature       */ \
     X("humi" ,  SENSOR_CLASS_HUMI      , s_int32_t            humi)		/* Relative Humidity */ \
     X("baro" ,  SENSOR_CLASS_BARO      , s_int32_t            baro)		/* Barometer         */ \
     X("li"   ,  SENSOR_CLASS_LIGHT     , s_int32_t            light)	/* Ambient light     */ \
     X("pr"   ,  SENSOR_CLASS_PROXIMITY , s_int32_t            proximity)/* Proximity         */ \
-    X("hr"   ,  SENSOR_CLASS_HR        , s_int32_t            hr)		/* Heart Rate        */ \
     X("tvoc" ,  SENSOR_CLASS_TVOC      , s_int32_t            tvoc)		/* TVOC Level        */ \
     X("noi"  ,  SENSOR_CLASS_NOISE     , s_int32_t            noise)	/* Noise Loudness    */ \
     X("step" ,  SENSOR_CLASS_STEP      , s_uint32_t           step)		/* Step sensor       */ \
     X("forc" ,  SENSOR_CLASS_FORCE     , s_int32_t            force)	/* Force sensor      */ \
     /*----------------------------------add new sensor below-------------------------------------*/ \
+	
+ 
+/* Sensor vendor types */	  
+#define SENSOR_VENDOR	\
+	X("unknow"		, SENSOR_VENDOR_UNKNOWN)  \
+	X("STM" 		, SENSOR_VENDOR_STM)  		/* STMicroelectronics */ \
+	X("Bosch" 		, SENSOR_VENDOR_BOSCH)  	/* Bosch */ 			 \
+	X("Invensense" 	, SENSOR_VENDOR_INVENSENSE)	/* Invensense */ 		 \
+	X("Semtech" 	, SENSOR_VENDOR_SEMTECH)  	/* Semtech */ 			 \
+	X("Goertek" 	, SENSOR_VENDOR_GOERTEK)  	/* Goertek */ 			 \
+	X("MiraMEMS" 	, SENSOR_VENDOR_MIRAMEMS)  	/* MiraMEMS */ 			 \
+	X("Dallas" 		, SENSOR_VENDOR_DALLAS)  	/* Dallas */ 			 \
+    /*----------------------add new vendor below----------------------*/ \
 	  
+	  
+#define SENSOR_INTF \
+	X("unknow" 		, SENSOR_INTF_UNKNOWN)	\
+	X("I2C" 		, SENSOR_INTF_I2C) 		\
+	X("SPI" 		, SENSOR_INTF_SPI) 		\
+	X("UART" 		, SENSOR_INTF_UART) 	\
+	X("CAN" 		, SENSOR_INTF_CAN ) 	\
+	X("ONEWIRE" 	, SENSOR_INTF_ONEWIRE) 	\
+	X("ADC" 		, SENSOR_INTF_ADC)		\
+	X("IO" 			, SENSOR_INTF_IO)		\
+	 /*------------------add new interface below----------------------*/ \
+
+	     
+/*enum sensor type*/	  
 #define X(a, b ,c)	 b,  
 typedef enum
 {
-	SENSOR_OBJ
-}SENSOR_TYPE;
+	SENSOR_PHY_TYPE
+	SENSOR_PHY_TYPE_MAX
+}SENSOR_TYPE_t;
 #undef X
+extern char *const sensor_type_str[];    
+#define SENSOR_TYPE_INFO(x)   sensor_type_str[((x)<SENSOR_PHY_TYPE_MAX ? (x):SENSOR_CLASS_NONE)] 
+
+/*enum sensor vendor*/	
+#define X(a,b) b,
+typedef enum
+{
+	SENSOR_VENDOR
+	SENSOR_VENDOR_MAX
+}SENSOR_VENDOR_t;
+#undef X
+extern char *const sensor_vendor_str[];
+#define SENSOR_VENDOR_INFO(x)   sensor_vendor_str[((x)<SENSOR_VENDOR_MAX ? (x):SENSOR_VENDOR_UNKNOWN)] 
+
+/*enum sensor interface*/	
+#define X(a,b)   b,
+typedef enum
+{
+	SENSOR_INTF
+	SENSOR_INTF_MAX
+}SENSOR_INTF_t;
+#undef X
+extern char *const sensor_intf_str[];
+#define SENSOR_INTF_INFO(x)   sensor_intf_str[(x)<1 ?(x):SENSOR_INTF_UNKNOWN]
+
+
 
 /* Sensor unit types */
 #define  SENSOR_UNIT_NONE           (0)
@@ -46,24 +97,6 @@ typedef enum
 #define  SENSOR_UNIT_MM             (12) /* Distance                unit: mm         */
 #define  SENSOR_UNIT_MN             (13) /* Force                   unit: mN         */
 
-/* Sensor vendor types */
-#define SENSOR_VENDOR_UNKNOWN       (0)
-#define SENSOR_VENDOR_STM           (1)  /* STMicroelectronics */
-#define SENSOR_VENDOR_BOSCH         (2)  /* Bosch */
-#define SENSOR_VENDOR_INVENSENSE    (3)  /* Invensense */
-#define SENSOR_VENDOR_SEMTECH       (4)  /* Semtech */
-#define SENSOR_VENDOR_GOERTEK       (5)  /* Goertek */
-#define SENSOR_VENDOR_MIRAMEMS      (6)  /* MiraMEMS */
-#define SENSOR_VENDOR_DALLAS        (7)  /* Dallas */
-
-/* Sensor communication interface types */
-#define  SENSOR_INTF_I2C            (1 << 0)
-#define  SENSOR_INTF_SPI            (1 << 1)
-#define  SENSOR_INTF_UART           (1 << 2)
-#define  SENSOR_INTF_CAN            (1 << 3)
-#define  SENSOR_INTF_ONEWIRE        (1 << 4)
-#define  SENSOR_INTF_ADC            (1 << 5)
-#define  SENSOR_INTF_IO             (1 << 6)
 
 /* Sensor power mode types */
 #define  SENSOR_POWER_NONE          (0)
@@ -160,7 +193,7 @@ struct sensor_data
     union
     {
 	  	#define X(a, b ,c)	 c; 
-	  	SENSOR_OBJ
+	  	SENSOR_PHY_TYPE
       	#undef X
     }data;
 };
@@ -174,10 +207,12 @@ struct sensor_ops
 
 
 struct sensor_device* sensor_find(const char* name);
+struct sensor_device* sensor_list(void);
 s_err_t sensor_open(struct sensor_device* sensor , s_uint16_t oflag);
 s_err_t sensor_close(struct sensor_device* sensor);
 s_size_t sensor_read(struct sensor_device* sensor , void *buf , s_size_t len);
 s_err_t sensor_control(struct sensor_device* sensor, int cmd, void *args);
+
 
 
 int hw_sensor_register(struct sensor_device* sensor,

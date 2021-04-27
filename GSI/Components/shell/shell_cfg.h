@@ -123,7 +123,8 @@
  *        定义此宏为获取系统Tick，如`HAL_GetTick()`
  * @note 此宏不定义时无法使用双击tab补全命令help，无法使用shell超时锁定
  */
-#define     SHELL_GET_TICK()            0
+unsigned int HAL_GetTick(void);
+#define     SHELL_GET_TICK()            HAL_GetTick()
 
 /**
  * @brief shell内存分配
@@ -140,7 +141,7 @@
 /**
  * @brief 是否显示shell信息
  */
-#define     SHELL_SHOW_INFO             1
+#define     SHELL_SHOW_INFO             0
 
 /**
  * @brief 是否在登录后清除命令行
@@ -150,7 +151,7 @@
 /**
  * @brief shell默认用户
  */
-#define     SHELL_DEFAULT_USER          "letter"
+#define     SHELL_DEFAULT_USER          "root"
 
 /**
  * @brief shell默认用户密码

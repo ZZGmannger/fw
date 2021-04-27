@@ -1056,9 +1056,6 @@
         <group>
             <name>User</name>
             <file>
-                <name>$PROJ_DIR$\..\Core\Src\Appsenso_temp.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\Core\Src\main.c</name>
             </file>
             <file>
@@ -1105,6 +1102,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\GSI\Device\sensor.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Device\sensor_cmd.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\GSI\Device\serial.c</name>

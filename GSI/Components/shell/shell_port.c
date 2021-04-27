@@ -58,10 +58,9 @@ INIT_COMPONENT_EXPORT(shell_init);
 
 int hello()
 {
-  LOG_E("Hello World\r\n");
- return 0;
+	LOG_E("Hello World\r\n");
+	return 0xfefefefe;
 }
 
-SHELL_EXPORT_CMD(
-SHELL_CMD_PERMISSION(0)|SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN,
-hello, hello, print hello);
+SHELL_EXPORT_CMD(0,hello_print, hello, print hello);
+

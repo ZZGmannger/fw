@@ -5,11 +5,25 @@
 #include <elog.h>
 
 #define X(a, b ,c)	 a,  
-static char *const sensor_name_str[] =
+char *const sensor_type_str[] =
 {
-    SENSOR_OBJ
+    SENSOR_PHY_TYPE
 };
 #undef X
+
+#define X(a , b)  a,
+char *const sensor_vendor_str[]=
+{
+	SENSOR_VENDOR
+};
+#undef X
+
+#define X(a,b) a,
+char *const sensor_intf_str[]=
+{
+	SENSOR_INTF
+};
+#undef  X
 
 static struct sensor_device _hw_sensor;
 
@@ -25,6 +39,19 @@ struct sensor_device* sensor_find(const char* name)
 		{
 			return cur_sensor;
 		}
+	}
+	
+	return NULL;
+}
+
+struct sensor_device* sensor_list(void)
+{
+	struct sensor_device*  cur_sensor = &_hw_sensor;
+	
+	if(cur_sensor->next != NULL)
+	{
+		cur_sensor = cur_sensor->next;
+		return cur_sensor;
 	}
 	
 	return NULL;

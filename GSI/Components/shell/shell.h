@@ -113,7 +113,7 @@
     #define SHELL_EXPORT_CMD(_attr, _name, _func, _desc) \
             const char shellCmd##_name[] = #_name; \
             const char shellDesc##_name[] = #_desc; \
-        __root const ShellCommand \
+       		__root const ShellCommand \
 			shellCommand##_name SECTION("shellCommand") =  \
             { \
                 .attr.value = _attr, \

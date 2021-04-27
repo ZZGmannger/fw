@@ -14,12 +14,12 @@ _/    _/  _/_/_/  _/_/_/    _/_/_/  _/      _/    _/_/_/  _/    _/  _/
 #include <elog.h>
 
 
-#define SHTXX_SENSOR_NUM   (1)
+#define SHTXX_SENSOR_NUM   (2)
 #define SHTXX_PARAM_NUM    (2)
 
-const char* sensor_name[SHTXX_SENSOR_NUM] = {"sht21_1"};
+const char* sensor_name[SHTXX_SENSOR_NUM] = {"sht21_1" , "sht21_2"};
 
- 
+
 struct sensor_parameter shtxx_param[SHTXX_PARAM_NUM] = 
 {
 	{
@@ -116,8 +116,6 @@ int hw_shtxx_sensor_init(void)
 		shtxx_obj[i].sensor.info.argc = SHTXX_PARAM_NUM;
 		shtxx_obj[i].sensor.info.param = shtxx_param;
 		
-		
-	
 	    result = hw_sensor_register(&shtxx_obj[i].sensor,
                                      sensor_name[i],
                                      SENSOR_FLAG_RDONLY,

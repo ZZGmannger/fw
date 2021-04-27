@@ -56,7 +56,7 @@
 #define ELOG_COLOR_ASSERT                        (F_MAGENTA B_NULL S_NORMAL)
 #define ELOG_COLOR_ERROR                         (F_RED B_NULL S_NORMAL)
 #define ELOG_COLOR_WARN                          (F_YELLOW B_NULL S_NORMAL)
-#define ELOG_COLOR_INFO                          (F_WHITE B_NULL S_NORMAL)
+#define ELOG_COLOR_INFO                          (F_GREEN B_NULL S_NORMAL)
 #define ELOG_COLOR_DEBUG                         (F_WHITE B_NULL S_NORMAL)
 #define ELOG_COLOR_VERBOSE                       (F_WHITE B_NULL S_NORMAL)
 
