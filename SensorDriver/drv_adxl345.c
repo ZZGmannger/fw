@@ -7,6 +7,124 @@
 //    (C)2016 RisingHF, all rights reserved.
 //*/
 #include "drv_adxl345.h"
+#include "sensor.h"
+
+
+#define LOG_TAG    "adxl"
+#include <elog.h>
+
+
+#define ADXL_SENSOR_NUM   (1)
+#define ADXL_PARAM_NUM    (1)
+
+static const char* adxl_sensor_name[ADXL_SENSOR_NUM] = {"adxl_1"};
+
+
+struct sensor_parameter adxl_param[ADXL_PARAM_NUM] = 
+{
+	{
+		.type                = SENSOR_CLASS_ACCE,                  
+		.unit                = SENSOR_UNIT_MG,  
+		.range_max           = 100,     
+		.range_min           = 0,             
+		.sensitivity         = 0,
+		.precision           = 1,                
+		.resolution          = 1,	
+	},
+};
+
+struct adxl_sensor
+{
+  	/*add some local parameter*/
+	struct sensor_device sensor;
+};
+struct adxl_sensor adxl_obj[ADXL_SENSOR_NUM];
+ 
+ 
+
+
+static s_size_t adxl_fetch_data(struct sensor_device *sensor, void *buf, s_size_t len)
+{
+	GSI_ASSERT(buf);
+	GSI_ASSERT(sensor);
+	
+	if(sensor->config.argc > sensor->info.argc)
+	{
+		return 0;
+	}
+	
+	struct sensor_data *value = (struct sensor_data *)buf;
+	
+	if (sensor->info.param[sensor->config.argc].type == SENSOR_CLASS_ACCE)
+	{
+		value->data.acce.x = 26;
+		value->data.acce.y = 123;
+		value->data.acce.z = -231;
+	}
+	return 0;
+}
+
+static s_err_t adxl_control(struct sensor_device *sensor, int cmd, void *args)
+{
+    s_err_t result = 0;
+	
+	switch(cmd)
+	{
+	  case SENSOR_CTRL_GET_ID:     
+	  {
+		  break;
+	  }
+	  case SENSOR_CTRL_GET_INFO:       
+	  {
+		  break;
+	  }
+	  case SENSOR_CTRL_SET_POWER:   
+	  {
+		  break;
+	  }
+	  case SENSOR_CTRL_SELF_TEST:   
+	  {
+		  break;
+	  }
+	}
+
+    return result;
+}
+static const struct sensor_ops _adxl_sensor_ops =
+{
+    adxl_fetch_data,
+    adxl_control
+};
+
+int hw_adxl_sensor_init(void)
+{
+  	int result =0; 
+  
+	for(uint8_t i=0;i<ADXL_SENSOR_NUM;i++)
+	{
+	    adxl_obj[i].sensor.ops = &_adxl_sensor_ops;
+		adxl_obj[i].sensor.info.intf_type = SENSOR_INTF_SPI;
+		adxl_obj[i].sensor.info.vendor = SENSOR_VENDOR_GOERTEK;
+	
+		adxl_obj[i].sensor.info.argc = ADXL_PARAM_NUM;
+		adxl_obj[i].sensor.info.param = adxl_param;
+		
+	    result = hw_sensor_register(&adxl_obj[i].sensor,
+                                     adxl_sensor_name[i],
+                                     SENSOR_FLAG_RDONLY,
+                                     NULL);
+		if(result != 0)
+		{
+			LOG_E("device register err code: %d", result);
+			goto __exit;
+		}
+	}
+__exit:
+    return -1;   
+}
+INIT_COMPONENT_EXPORT(hw_adxl_sensor_init);
+
+
 //#include "board.h"
 //
 //int adxl345_write(uint8_t addr, uint8_t val)

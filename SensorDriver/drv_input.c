@@ -7,77 +7,56 @@ _/    _/  _/_/_/  _/_/_/    _/_/_/  _/      _/    _/_/_/  _/    _/  _/
     (C)2015 RisingHF, all rights reserved.
 */
  
-#include "drv_sht21.h"
+#include "drv_input.h"
 #include "board.h"
 
-#define LOG_TAG    "shtxx"
+#define LOG_TAG    "input sensor"
 #include <elog.h>
 
 
-#define SHTXX_SENSOR_NUM   (2)
-#define SHTXX_PARAM_NUM    (2)
+static const char* sensor_name = "digtal_input";
 
-static const char* sensor_name[SHTXX_SENSOR_NUM] = {"sht21_1" , "sht21_2"};
-
-
-struct sensor_parameter shtxx_param[SHTXX_PARAM_NUM] = 
+struct sensor_parameter input_param[] = 
 {
 	{
-		.type                = SENSOR_CLASS_HUMI,                  
-		.unit                = SENSOR_UNIT_PERMILLAGE,  
-		.range_max           = 100,     
-		.range_min           = 0,             
-		.sensitivity         = 0,
-		.precision           = 1,                
-		.resolution          = 1,	
+		.type                = SENSOR_CLASS_IO_DOOR,                  
 	},
 	{
-		.type                = SENSOR_CLASS_TEMP,                                  
-		.unit                = SENSOR_UNIT_PERMILLAGE,  
-		.range_max           = 100,     
-		.range_min           = 0,             
-		.sensitivity         = 0,
-		.precision           = 1,                
-		.resolution          = 1,		   
-	}
+		.type                = SENSOR_CLASS_IO_WATER,                                  	   
+	},
 };
 
-struct shtxx_sensor
+#define INPUT_PARAM_NUM    sizeof(input_param)/sizeof(input_param[0])
+
+
+struct input_sensor
 {
 	struct sensor_device sensor;
 };
-struct shtxx_sensor shtxx_obj[SHTXX_SENSOR_NUM] ;
- 
+struct input_sensor input_sensor_obj;
 
 
-static s_size_t shtxx_fetch_data(struct sensor_device *sensor, void *buf, s_size_t len)
+static s_size_t input_fetch_data(struct sensor_device *sensor, void *buf, s_size_t len)
 {
 	GSI_ASSERT(buf);
 	GSI_ASSERT(sensor);
 	
-	if(sensor->config.argc > sensor->info.argc)
-	{
-		return 0;
-	}
 	struct sensor_data *value = (struct sensor_data *)buf;
-	if (sensor->info.param[sensor->config.argc].type == SENSOR_CLASS_TEMP)
+	
+	switch(sensor->info.param[sensor->config.argc].type)
 	{
-		if(sensor->info.name == sensor_name[0])
-			value->data.temp = 26;
-		else
-			value->data.temp = -28;
+		case SENSOR_CLASS_IO_DOOR:
+		    value->data.door = 1;  //read the gpio
+			break;
+		case SENSOR_CLASS_IO_WATER:
+		    value->data.water = 0; //read the gpio
+			break;
 	}
-	else if (sensor->info.param[sensor->config.argc ].type == SENSOR_CLASS_HUMI)
-	{
-		if(sensor->info.name == sensor_name[0])
-			value->data.humi  = 67;
-		else
-			value->data.humi  = 95;
-	}
+	  
 	return 0;
 }
 
-static s_err_t shtxx_control(struct sensor_device *sensor, int cmd, void *args)
+static s_err_t input_control(struct sensor_device *sensor, int cmd, void *args)
 {
     s_err_t result = 0;
 	
@@ -103,38 +82,36 @@ static s_err_t shtxx_control(struct sensor_device *sensor, int cmd, void *args)
 
     return result;
 }
-static const struct sensor_ops _shtxx_sensor_ops =
+static const struct sensor_ops _input_sensor_ops =
 {
-    shtxx_fetch_data,
-    shtxx_control
+    input_fetch_data,
+    input_control
 };
 
-int hw_shtxx_sensor_init(void)
+int hw_input_sensor_init(void)
 {
   	int result =0; 
   
-	for(uint8_t i=0;i<SHTXX_SENSOR_NUM;i++)
+	input_sensor_obj.sensor.ops = &_input_sensor_ops;
+	input_sensor_obj.sensor.info.vendor = SENSOR_VENDOR_INVENSENSE;
+	input_sensor_obj.sensor.info.intf_type = SENSOR_INTF_IO;
+	input_sensor_obj.sensor.info.argc = INPUT_PARAM_NUM;
+	input_sensor_obj.sensor.info.param = input_param;
+	
+	result = hw_sensor_register(&input_sensor_obj.sensor,
+								 sensor_name,
+								 SENSOR_FLAG_RDONLY,
+								 NULL);
+	if(result != 0)
 	{
-	    shtxx_obj[i].sensor.ops = &_shtxx_sensor_ops;
-		shtxx_obj[i].sensor.info.vendor = SENSOR_VENDOR_INVENSENSE;
-		shtxx_obj[i].sensor.info.intf_type = SENSOR_INTF_I2C;
-		shtxx_obj[i].sensor.info.argc = SHTXX_PARAM_NUM;
-		shtxx_obj[i].sensor.info.param = shtxx_param;
-		
-	    result = hw_sensor_register(&shtxx_obj[i].sensor,
-                                     sensor_name[i],
-                                     SENSOR_FLAG_RDONLY,
-                                     NULL);
-		if(result != 0)
-		{
-			LOG_E("device register err code: %d", result);
-			goto __exit;
-		}
+		LOG_E("device register err code: %d", result);
+		goto __exit;
 	}
+	
 __exit:
     return -1;   
 }
-INIT_COMPONENT_EXPORT(hw_shtxx_sensor_init);
+INIT_COMPONENT_EXPORT(hw_input_sensor_init);
 
 //
 //

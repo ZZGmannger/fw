@@ -7,6 +7,134 @@
 //    (C)2016 RisingHF, all rights reserved.
 //*/
 #include "drv_th02.h"
+#include "sensor.h"
+
+#define LOG_TAG    "th02"
+#include <elog.h>
+
+
+#define TH02_SENSOR_NUM   (1)
+#define TH02_PARAM_NUM    (2)
+
+static const char* th_sensor_name[TH02_SENSOR_NUM] = {"th02_1"};
+
+
+struct sensor_parameter th02_param[TH02_PARAM_NUM] = 
+{
+	{
+		.type                = SENSOR_CLASS_HUMI,                  
+		.unit                = SENSOR_UNIT_PERMILLAGE,  
+		.range_max           = 100,     
+		.range_min           = 0,             
+		.sensitivity         = 0,
+		.precision           = 1,                
+		.resolution          = 1,	
+	},
+	{
+		.type                = SENSOR_CLASS_TEMP,                                  
+		.unit                = SENSOR_UNIT_PERMILLAGE,  
+		.range_max           = 100,     
+		.range_min           = 0,             
+		.sensitivity         = 0,
+		.precision           = 1,                
+		.resolution          = 1,		   
+	}
+};
+
+struct th02_sensor
+{
+	struct sensor_device sensor;
+};
+struct th02_sensor th02_obj[TH02_SENSOR_NUM] ;
+ 
+
+
+static s_size_t th02_fetch_data(struct sensor_device *sensor, void *buf, s_size_t len)
+{
+	GSI_ASSERT(buf);
+	GSI_ASSERT(sensor);
+	
+	if(sensor->config.argc > sensor->info.argc)
+	{
+		return 0;
+	}
+	
+	struct sensor_data *value = (struct sensor_data *)buf;
+	
+	if (sensor->info.param[sensor->config.argc].type == SENSOR_CLASS_TEMP)
+	{
+		value->data.temp = -12;
+	}
+	else if (sensor->info.param[sensor->config.argc ].type == SENSOR_CLASS_HUMI)
+	{
+		value->data.humi  = 98;
+	}
+	 
+	return 0;
+}
+
+static s_err_t th02_control(struct sensor_device *sensor, int cmd, void *args)
+{
+    s_err_t result = 0;
+	
+	switch(cmd)
+	{
+	  case SENSOR_CTRL_GET_ID:     
+	  {
+		  break;
+	  }
+	  case SENSOR_CTRL_GET_INFO:       
+	  {
+		  break;
+	  }
+	  case SENSOR_CTRL_SET_POWER:   
+	  {
+		  break;
+	  }
+	  case SENSOR_CTRL_SELF_TEST:   
+	  {
+		  break;
+	  }
+	}
+
+    return result;
+}
+static const struct sensor_ops _th02_sensor_ops =
+{
+    th02_fetch_data,
+    th02_control
+};
+
+int hw_th02_sensor_init(void)
+{
+  	int result =0; 
+  
+	for(uint8_t i=0;i<TH02_SENSOR_NUM;i++)
+	{
+	    th02_obj[i].sensor.ops = &_th02_sensor_ops;
+		th02_obj[i].sensor.info.vendor = SENSOR_VENDOR_MIRAMEMS;
+		th02_obj[i].sensor.info.intf_type = SENSOR_INTF_I2C;
+		
+		th02_obj[i].sensor.info.argc = TH02_PARAM_NUM;
+		th02_obj[i].sensor.info.param = th02_param;
+		
+	    result = hw_sensor_register(&th02_obj[i].sensor,
+                                     th_sensor_name[i],
+                                     SENSOR_FLAG_RDONLY,
+                                     NULL);
+		if(result != 0)
+		{
+			LOG_E("device register err code: %d", result);
+			goto __exit;
+		}
+	}
+__exit:
+    return -1;   
+}
+INIT_COMPONENT_EXPORT(hw_th02_sensor_init);
+
+
+
 //#include "board.h"
 //
 //int th02_write(uint8_t addr, uint8_t val)

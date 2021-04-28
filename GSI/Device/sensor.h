@@ -18,31 +18,33 @@
     X("noi"  ,  SENSOR_CLASS_NOISE     , s_int32_t            noise)	/* Noise Loudness    */ \
     X("step" ,  SENSOR_CLASS_STEP      , s_uint32_t           step)		/* Step sensor       */ \
     X("forc" ,  SENSOR_CLASS_FORCE     , s_int32_t            force)	/* Force sensor      */ \
+	X("door" ,  SENSOR_CLASS_IO_DOOR   , s_bool_t             door)	    /* door sensor       */ \
+	X("water" , SENSOR_CLASS_IO_WATER  , s_bool_t             water)    /* water sensor       */ \
     /*----------------------------------add new sensor below-------------------------------------*/ \
 	
  
 /* Sensor vendor types */	  
 #define SENSOR_VENDOR	\
-	X("unknow"		, SENSOR_VENDOR_UNKNOWN)  \
-	X("STM" 		, SENSOR_VENDOR_STM)  		/* STMicroelectronics */ \
-	X("Bosch" 		, SENSOR_VENDOR_BOSCH)  	/* Bosch */ 			 \
-	X("Invensense" 	, SENSOR_VENDOR_INVENSENSE)	/* Invensense */ 		 \
-	X("Semtech" 	, SENSOR_VENDOR_SEMTECH)  	/* Semtech */ 			 \
-	X("Goertek" 	, SENSOR_VENDOR_GOERTEK)  	/* Goertek */ 			 \
-	X("MiraMEMS" 	, SENSOR_VENDOR_MIRAMEMS)  	/* MiraMEMS */ 			 \
-	X("Dallas" 		, SENSOR_VENDOR_DALLAS)  	/* Dallas */ 			 \
+	X("unknow"		, SENSOR_VENDOR_UNKNOWN        )  \
+	X("STM" 		, SENSOR_VENDOR_STM            )  		/* STMicroelectronics */ \
+	X("Bosch" 		, SENSOR_VENDOR_BOSCH          )  	/* Bosch */ 			 \
+	X("Invensense" 	, SENSOR_VENDOR_INVENSENSE      )	/* Invensense */ 		 \
+	X("Semtech" 	, SENSOR_VENDOR_SEMTECH        )  	/* Semtech */ 			 \
+	X("Goertek" 	, SENSOR_VENDOR_GOERTEK          )  	/* Goertek */ 			 \
+	X("MiraMEMS" 	, SENSOR_VENDOR_MIRAMEMS      )  	/* MiraMEMS */ 			 \
+	X("Dallas" 		, SENSOR_VENDOR_DALLAS         )  	/* Dallas */ 			 \
     /*----------------------add new vendor below----------------------*/ \
 	  
 	  
 #define SENSOR_INTF \
-	X("unknow" 		, SENSOR_INTF_UNKNOWN)	\
-	X("I2C" 		, SENSOR_INTF_I2C) 		\
-	X("SPI" 		, SENSOR_INTF_SPI) 		\
-	X("UART" 		, SENSOR_INTF_UART) 	\
-	X("CAN" 		, SENSOR_INTF_CAN ) 	\
-	X("ONEWIRE" 	, SENSOR_INTF_ONEWIRE) 	\
-	X("ADC" 		, SENSOR_INTF_ADC)		\
-	X("IO" 			, SENSOR_INTF_IO)		\
+	X("unknow" 		, SENSOR_INTF_UNKNOWN      )	\
+	X("I2C" 		, SENSOR_INTF_I2C         ) 		\
+	X("SPI" 		, SENSOR_INTF_SPI         ) 		\
+	X("UART" 		, SENSOR_INTF_UART        ) 	\
+	X("CAN" 		, SENSOR_INTF_CAN           ) 	\
+	X("ONEWIRE" 	, SENSOR_INTF_ONEWIRE        ) 	\
+	X("ADC" 		, SENSOR_INTF_ADC          )		\
+	X("IO" 			, SENSOR_INTF_IO          )		\
 	 /*------------------add new interface below----------------------*/ \
 
 	     
@@ -77,7 +79,7 @@ typedef enum
 }SENSOR_INTF_t;
 #undef X
 extern char *const sensor_intf_str[];
-#define SENSOR_INTF_INFO(x)   sensor_intf_str[(x)<1 ?(x):SENSOR_INTF_UNKNOWN]
+#define SENSOR_INTF_INFO(x)   sensor_intf_str[(x)<SENSOR_INTF_MAX ?(x):SENSOR_INTF_UNKNOWN]
 
 
 
@@ -161,7 +163,7 @@ struct sensor_config
 
 struct sensor_device
 {
-  	struct sensor_device* next;
+  	struct sensor_device*     next;
     struct sensor_info        info;      /* The sensor info data */
     struct sensor_config      config;    /* The sensor config data */
 	
@@ -170,9 +172,6 @@ struct sensor_device
 	s_uint16_t init_flag;
 	s_uint16_t open_flag;
 	
-    void                      *data_buf;  /* The buf of the data received */
-    s_size_t                   data_len;  /* The size of the data received */
-
     const struct sensor_ops  *ops;       /* The sensor ops */
     s_err_t (*rx_indicate)(struct sensor_device* sensor,s_size_t size);             /* Called when an interrupt is generated, registered by the driver */
 };

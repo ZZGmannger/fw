@@ -1132,6 +1132,12 @@
             <name>$PROJ_DIR$\..\SensorDriver\drv_adxl345.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\SensorDriver\drv_input.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\SensorDriver\drv_input.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\SensorDriver\drv_sht21.c</name>
         </file>
         <file>

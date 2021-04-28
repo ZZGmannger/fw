@@ -4,22 +4,36 @@
 #include <elog.h>
  
 
-void sensor_show_data(struct sensor_data* data);
-
-int sensor_init_cmd(const char* name)
+__weak void sensor_show_data(struct sensor_data* data)
 {
-  	struct sensor_device* sensor = sensor_find(name);
- 
-	if(sensor == NULL)
+	switch(data->type)
 	{
-		LOG_E("sensor \"%s\" was not found",name);
-		return -1;
+		case SENSOR_CLASS_ACCE :
+		  	LOG_D("acce x:%d",data->data.acce.x);
+		  	LOG_D("acce y:%d",data->data.acce.y);
+		  	LOG_D("acce z:%d",data->data.acce.z);break;
+		case SENSOR_CLASS_TEMP :
+		  	LOG_D("temp: %d" ,data->data.temp);	break;
+		case SENSOR_CLASS_HUMI :
+		  	LOG_D("humi: %d%" ,data->data.humi);break;
+		case SENSOR_CLASS_BARO :
+			LOG_D("");break;
+		case SENSOR_CLASS_LIGHT :
+			LOG_D("");break;
+		case SENSOR_CLASS_PROXIMITY :
+			LOG_D("");break;
+		case SENSOR_CLASS_TVOC :
+			  LOG_D(""); break;
+		case SENSOR_CLASS_NOISE :
+			LOG_D("");break;
+		case  SENSOR_CLASS_STEP :
+			LOG_D("");break;
+		case SENSOR_CLASS_FORCE :
+			LOG_D("");break;
 	}
-	sensor_open(sensor , SENSOR_FLAG_RDONLY);
-	return 0;
 }
- 
-void sensor_info_cmd(struct sensor_device* sensor)
+
+static void sensor_info_log(struct sensor_device* sensor)
 {
 	if(sensor != NULL)
 	{
@@ -41,7 +55,7 @@ void sensor_info_cmd(struct sensor_device* sensor)
 	}
 }
 
-void sensor_read_cmd(struct sensor_device* sensor)		
+static void sensor_read_param(struct sensor_device* sensor)		
 {
 	struct sensor_data sdata = {0};
 	for(uint8_t i=0;i<sensor->info.argc;i++)
@@ -55,90 +69,76 @@ void sensor_read_cmd(struct sensor_device* sensor)
 	}
 }
 
-__weak void sensor_show_data(struct sensor_data* data)
-{
-	switch(data->type)
-	{
-		case SENSOR_CLASS_ACCE :
-			LOG_D("");
-			break;
-		case SENSOR_CLASS_TEMP :
-		    //connect to lap
-		  	LOG_D("temp: %d" ,data->data.temp);
-		  	break;
-		case SENSOR_CLASS_HUMI :
-		   //connect to lap
-		  	LOG_D("humi: %d%" ,data->data.humi);
-		  	break;
-		case SENSOR_CLASS_BARO :
-			LOG_D("");
-			break;
-		case SENSOR_CLASS_LIGHT :
-			LOG_D("");
-			break;
-		case SENSOR_CLASS_PROXIMITY :
-			LOG_D("");
-			break;
-		case SENSOR_CLASS_TVOC :
-			  LOG_D("");
-		  break;
-		case SENSOR_CLASS_NOISE :
-			LOG_D("");
-			break;
-		case  SENSOR_CLASS_STEP :
-			LOG_D("");
-			break;
-		case SENSOR_CLASS_FORCE :
-			LOG_D("");
-			break;
-	}
-}
-
-static void sensor(int argc, char* sensor_name  , char *argv)
+void sensor_list_all_cmd(void)
 {
 	struct sensor_device* cur_sensor;
-	if(argc==3)
+	cur_sensor = sensor_list();
+	while(NULL != cur_sensor)
 	{
-		cur_sensor = sensor_list();
-		while(NULL != cur_sensor)
-		{
-			LOG_I(" %s ",cur_sensor->info.name);
-		  	cur_sensor = cur_sensor->next;
-		}
-	}
-	else if(argc ==4)
-	{
-		if(0==strcmp(argv , "list"))
-		{
-			cur_sensor = sensor_list();
-			while(NULL != cur_sensor)
-			{
-				LOG_I(" %s ",cur_sensor->info.name);
-				cur_sensor = cur_sensor->next;
-			}
-		}
-	}
-	else if(argc==5)
-	{
-		if(0==strcmp(argv , "info"))
-		{
-			cur_sensor = sensor_find(sensor_name);
-			if(cur_sensor != NULL)
-			{
-				sensor_info_cmd(cur_sensor);
-			}
-			else
-			{
-				LOG_W("sensor \"%s\" was not found",sensor_name);	
-			}
-		}
-		else if(0==strcmp(argv , "read"))
-		{
-			cur_sensor = sensor_find(sensor_name);
-			sensor_init_cmd(sensor_name);
-			sensor_read_cmd(cur_sensor);
-		}
+		LOG_I(" %s ",cur_sensor->info.name);
+		cur_sensor = cur_sensor->next;
 	}
 }
+SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_list, sensor_list_all_cmd, list all sensor name);
 
-SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor, sensor, sensor);
+
+void sensor_info_cmd(const char* name)
+{
+	struct sensor_device* cur_sensor;
+	cur_sensor = sensor_find(name);
+	if(cur_sensor != NULL)
+	{
+		sensor_info_log(cur_sensor);
+	}
+	else
+	{
+		LOG_W("sensor \"%s\" was not found",name);	
+	}
+}
+SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_info, sensor_info_cmd,  sensor information);
+
+
+static void sensor_init_cmd(const char* name)
+{
+  	struct sensor_device* sensor = sensor_find(name);
+ 
+	if(sensor == NULL)
+	{
+		LOG_E("sensor \"%s\" was not found",name);
+		return;
+	}
+	sensor_open(sensor , SENSOR_FLAG_RDONLY);
+}
+SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_init, sensor_init_cmd,  sensor init);
+
+
+static void sensor_read_cmd(const char* name)
+{
+	struct sensor_device* cur_sensor;
+	cur_sensor = sensor_find(name);
+	if(cur_sensor != NULL)
+	{
+		sensor_read_param(cur_sensor);
+	}
+	else
+	{
+		LOG_W("sensor \"%s\" was not found",name);	
+	}
+}
+SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_read, sensor_read_cmd, read single sensor);
+
+
+static void sensor_read_all_cmd(void)
+{
+  	struct sensor_device* cur_sensor;
+	cur_sensor = sensor_list();
+	while(NULL != cur_sensor)
+	{
+		LOG_I(" %s ",cur_sensor->info.name);
+		sensor_read_param(cur_sensor);
+		cur_sensor = cur_sensor->next;
+	}
+}
+SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_read_all, sensor_read_all_cmd, read all sensor);
+
+
