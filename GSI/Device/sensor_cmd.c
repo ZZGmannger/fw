@@ -30,8 +30,17 @@ __weak void sensor_show_data(struct sensor_data* data)
 			LOG_D("");break;
 		case SENSOR_CLASS_FORCE :
 			LOG_D("");break;
+		case SENSOR_CLASS_IO_DOOR:
+		    LOG_D("door is %s" ,data->data.door ?"open":"close");    
+			break;
+		case SENSOR_CLASS_IO_WATER:
+			LOG_D("water is %s" ,data->data.water ?"in":"out"); 
+			break;
 	}
 }
+
+
+
 
 static void sensor_info_log(struct sensor_device* sensor)
 {
@@ -98,6 +107,10 @@ void sensor_info_cmd(const char* name)
 SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_info, sensor_info_cmd,  sensor information);
 
 
+void sensor_rx_indicate(struct sensor_device* sensor)
+{
+	sensor_read_param(sensor);		
+}
 static void sensor_init_cmd(const char* name)
 {
   	struct sensor_device* sensor = sensor_find(name);
@@ -108,6 +121,7 @@ static void sensor_init_cmd(const char* name)
 		return;
 	}
 	sensor_open(sensor , SENSOR_FLAG_RDONLY);
+	sensor_control(sensor, SENSOR_CTRL_SET_IND , (void*)sensor_rx_indicate);
 }
 SHELL_EXPORT_CMD(SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC)|SHELL_CMD_DISABLE_RETURN ,sensor_init, sensor_init_cmd,  sensor init);
 

@@ -18,10 +18,9 @@
     X("noi"  ,  SENSOR_CLASS_NOISE     , s_int32_t            noise)	/* Noise Loudness    */ \
     X("step" ,  SENSOR_CLASS_STEP      , s_uint32_t           step)		/* Step sensor       */ \
     X("forc" ,  SENSOR_CLASS_FORCE     , s_int32_t            force)	/* Force sensor      */ \
-	X("door" ,  SENSOR_CLASS_IO_DOOR   , s_bool_t             door)	    /* door sensor       */ \
-	X("water" , SENSOR_CLASS_IO_WATER  , s_bool_t             water)    /* water sensor       */ \
     /*----------------------------------add new sensor below-------------------------------------*/ \
-	
+	X("door" ,  SENSOR_CLASS_IO_DOOR   , s_uint32_t             door)	    /* door sensor   */ \
+	X("water" , SENSOR_CLASS_IO_WATER  , s_uint32_t             water)    /* water sensor    */ \
  
 /* Sensor vendor types */	  
 #define SENSOR_VENDOR	\
@@ -173,10 +172,10 @@ struct sensor_device
 	s_uint16_t open_flag;
 	
     const struct sensor_ops  *ops;       /* The sensor ops */
-    s_err_t (*rx_indicate)(struct sensor_device* sensor,s_size_t size);             /* Called when an interrupt is generated, registered by the driver */
+    void (*rx_indicate)(struct sensor_device* sensor);             /* Called when an interrupt is generated, registered by the driver */
 };
 
-typedef s_err_t (*rx_indicate_func_t)(struct sensor_device* sensor,s_size_t size);  
+typedef void (*rx_indicate_func_t)(struct sensor_device* sensor);  
 
 /* 3-axis Data Type */
 struct sensor_3_axis

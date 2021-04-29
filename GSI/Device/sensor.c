@@ -127,26 +127,9 @@ s_size_t sensor_read(struct sensor_device* sensor , void *buf , s_size_t len)
     {
         return 0;
     }
-
-//    /* The buffer is not empty. Read the data in the buffer first */
-//    if (sensor->data_len > 0 && sensor->data_buf!= GSI_NULL)
-//    {
-//        if (len > sensor->data_len / sizeof(struct sensor_data))
-//        {
-//            len = sensor->data_len / sizeof(struct sensor_data);
-//        }
-//
-//        s_memcpy(buf, sensor->data_buf, len * sizeof(struct sensor_data));
-//
-//        /* Clear the buffer */
-//        sensor->data_len = 0;
-//        result = len;
-//    }
-//    else
-    {
-        /* If the buffer is empty read the data */
-        result = sensor->ops->fetch_data(sensor, buf, len);
-    }
+	/* If the buffer is empty read the data */
+	result = sensor->ops->fetch_data(sensor, buf, len);
+    
     return result;
 }
 

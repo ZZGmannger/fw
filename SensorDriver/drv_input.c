@@ -14,7 +14,7 @@ _/    _/  _/_/_/  _/_/_/    _/_/_/  _/      _/    _/_/_/  _/    _/  _/
 #include <elog.h>
 
 
-static const char* sensor_name = "digtal_input";
+static const char* sensor_name = "digital_input";
 
 struct sensor_parameter input_param[] = 
 {
@@ -39,7 +39,7 @@ struct input_sensor input_sensor_obj;
 static s_size_t input_fetch_data(struct sensor_device *sensor, void *buf, s_size_t len)
 {
 	GSI_ASSERT(buf);
-	GSI_ASSERT(sensor);
+	GSI_ASSERT(sensosr);
 	
 	struct sensor_data *value = (struct sensor_data *)buf;
 	
