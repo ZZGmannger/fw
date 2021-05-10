@@ -1098,6 +1098,12 @@
                 <name>$PROJ_DIR$\..\GSI\Device\i2c.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\GSI\Device\i2c_bit.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\GSI\Device\i2c_bit.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\GSI\Device\pin.c</name>
             </file>
             <file>
@@ -1153,6 +1159,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\drv_gpio.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\drv_i2c.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\drv_i2c.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\drv_uart.c</name>

@@ -2,161 +2,95 @@
 #include "i2c.h"
 #include "gsi_def.h"
 
- 
-#define I2C_WRITE_EN    0
-#define I2C_READ_EN     1
-
-#define I2C_HIGH     1
-#define I2C_LOW      0
-
-#define I2C_NOACK    0
-#define I2C_ACK      1
 
 
-#define I2C_SDA(x)  x
-#define I2C_SCL(x)  x
-#define I2C_Delay() 1
+/**/
+struct i2c_bus_device _hw_i2c_bus_device;
 
-#define I2C_SDA_READ    1
-
-void i2c_start(void)
+void i2c_bus_register(struct i2c_bus_device* bus , const char* name)
 {
-	I2C_SCL(I2C_HIGH);
-	I2C_Delay();
 	
-	I2C_SDA(I2C_HIGH);
-	I2C_Delay();
-	I2C_SDA(I2C_LOW);
-	I2C_Delay();
 }
 
-void i2c_stop(void)
+struct i2c_bus_device* i2c_bus_find(const char* name)
 {
-	I2C_SDA(I2C_LOW);
-	I2C_Delay();
+	struct i2c_bus_device* cur_bus = &_hw_i2c_bus_device;
 	
-	I2C_SCL(I2C_HIGH);
-	I2C_Delay();
-	
-	I2C_SDA(I2C_HIGH);
-	I2C_Delay();
-}
-
-s_uint8_t i2c_get_ack(void)
-{
-  s_uint8_t ack;
-
-  I2C_SCL(I2C_LOW);      
-  I2C_Delay();
-  
-  /*release sda in opne drain mode*/
-  I2C_SDA(I2C_HIGH);     
-  I2C_Delay();
-
-  /*scl high then sda is valid*/ 
-  I2C_SCL(I2C_HIGH);    
-  I2C_Delay();
-
-  ack = I2C_SDA_READ ? I2C_NOACK:I2C_ACK;
-  
-//  I2C_SCL_LOW;    
-//  I2C_Delay();
-
-  return ack;
-}
-
-void i2c_put_ack(s_uint8_t ack)
-{
-	I2C_SCL(I2C_LOW);      
-	I2C_Delay();
-	
-	if(ack == I2C_NOACK)
-	  I2C_SDA(I2C_LOW);
-	else
-	  I2C_SDA(I2C_HIGH);
-	I2C_Delay();
-	
-	I2C_SCL(I2C_HIGH);      
-	I2C_Delay();
-}
-
-void i2c_write_byte(s_uint8_t data)
-{
-	for(s_uint8_t i=0;i<8;i++)
+	while(cur_bus->next !=NULL)
 	{
-	  	I2C_SCL(I2C_LOW);      
-		I2C_Delay();
-	  
-		if(data & 0x80)
-		  I2C_SDA(I2C_HIGH);
-		else
-		  I2C_SDA(I2C_LOW);
-		data <<= 1;
-		
-		I2C_SCL(I2C_HIGH);      
-		I2C_Delay();
+		cur_bus = cur_bus->next;
+		if(0 == strcmp(name , cur_bus->name))
+		{
+			return cur_bus;
+		}
 	}
-	
-	i2c_get_ack();
+	return GSI_NULL;
 }
 
-s_uint8_t i2c_read_byte(s_uint8_t ack)
+void i2c_bus_open(struct i2c_bus_device* bus , s_uint16_t flag)
 {
-  	s_uint8_t data =0;
-	
-	I2C_SCL(I2C_LOW);      
-	I2C_Delay();
-	
-	for(s_uint8_t i=0;i<8;i++)
-	{
-		I2C_SCL(I2C_HIGH);      
-		I2C_Delay();
-		
-		data <<= 1;
-		if(I2C_SDA_READ)
-		  data |= 0x01;
 
-		I2C_SCL(I2C_LOW);      
-		I2C_Delay();  
-	}
-	i2c_put_ack(ack);
-
-	return data;
 }
 
-
-void i2c_write_regs(s_uint8_t id ,s_uint16_t addr ,s_uint8_t*buf ,s_uint8_t len)
+void i2c_bus_transfer(struct i2c_bus_device* bus ,  struct i2c_msg* msg)
 {
-  	s_uint8_t i=0;
-	i2c_start();
-	
-	i2c_write_byte(id<<1|I2C_WRITE_EN);
-	i2c_write_byte(addr);
-	
-	for(i=0; i<len;i++)
-	{
-		i2c_write_byte(*buf++);
-	}
- 
-	i2c_stop();
+	GSI_ASSERT(bus);
+	bus->ops->master_xfer(bus , msg);
 }
 
 
-void i2c_read_regs(s_uint8_t id ,s_uint8_t addr ,s_uint8_t*buf ,s_uint8_t len)
+void i2c_bus_control(struct i2c_bus_device* bus , 
+				     s_uint16_t cmd ,  
+					 void* param)
 {
-	s_uint8_t i=0;
-	i2c_start();
-	
-	i2c_write_byte(id<<1|I2C_WRITE_EN);
-	i2c_write_byte(addr);
-	
-	i2c_start();
-	i2c_write_byte(id<<1|I2C_READ_EN);
-	
-	for(i=0; i<len-1;i++)
-	{
-		*buf++ = i2c_read_byte(I2C_ACK);
-	}
-	*buf++ = i2c_read_byte(I2C_NOACK);
-	i2c_stop();
+	GSI_ASSERT(bus);
+ 	
 }
+
+
+
+struct i2c_bus_device*  test;
+
+void i2c_test(void)
+{
+	test = i2c_bus_find("i2c1");
+	if(test!= NULL)
+	{
+		i2c_bus_open(test , 0);
+	}
+}
+
+
+void write_reg(s_uint8_t id , s_uint8_t reg ,s_uint8_t* buf ,s_uint8_t len)
+{
+	struct i2c_msg msg = {0};
+
+	msg.addr = id;
+	msg.flags = I2C_WR|I2C_NO_STOP;
+	msg.buf = &reg;
+	msg.len = 1;
+	i2c_bus_transfer(test , &msg);
+	
+	msg.flags = I2C_WR;
+	msg.buf = buf;
+	msg.len = len;
+	i2c_bus_transfer(test , &msg);
+}
+
+void read_reg(s_uint8_t id , s_uint8_t reg ,s_uint8_t* buf ,s_uint8_t len)
+{
+	struct i2c_msg msg = {0};
+
+	msg.addr = id;
+	msg.flags = I2C_WR|I2C_NO_STOP;
+	msg.buf = &reg;
+	msg.len = 1;
+	i2c_bus_transfer(test , &msg);
+	
+	msg.flags = I2C_RD;
+	msg.buf = buf;
+	msg.len = len;
+	i2c_bus_transfer(test , &msg);
+}
+
+
