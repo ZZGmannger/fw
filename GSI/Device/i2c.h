@@ -12,6 +12,11 @@
 #define I2C_IGNORE_NACK      (1u << 6)
 #define I2C_NO_READ_ACK      (1u << 7)  /* when I2C reading, we do not ACK */
 
+
+#define I2C_CTRL_ADDR_10BIT    0
+#define I2C_CTRL_TIMEOUT       1
+#define I2C_CTRL_RETRY         2 
+
 struct i2c_msg
 {
     s_uint16_t addr;
@@ -25,13 +30,12 @@ struct i2c_bus_device;
 
 struct i2c_bus_device_ops
 {
+	void (*open)(struct i2c_bus_device *bus, s_uint32_t flag);
+                           
     s_size_t (*master_xfer)(struct i2c_bus_device *bus,
                              struct i2c_msg* msg);
                            
-    s_size_t (*slave_xfer)(struct i2c_bus_device *bus,
-                            struct i2c_msg* msg);
-                           
-    s_err_t (*i2c_bus_control)(struct i2c_bus_device *bus,
+    s_err_t (*control)(struct i2c_bus_device *bus,
                                 s_uint16_t cmd ,
                                 void* param);
 };
@@ -44,7 +48,7 @@ struct i2c_bus_device
 	const char* name;
     s_uint16_t  flags;
     s_uint32_t  timeout;
-    s_uint32_t  retries;
+    s_uint32_t  retry;
     void *priv;
 };
 

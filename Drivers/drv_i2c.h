@@ -5,7 +5,12 @@
 #include "board.h"
 #include "pin.h"
 
- 
+
+
+
+
+
+
 int hw_i2c_init(void);
 
 #endif
